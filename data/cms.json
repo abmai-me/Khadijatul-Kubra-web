@@ -1,0 +1,816 @@
+{
+  "header": {
+    "email": "info@khadijatulkubratrust.org",
+    "address": "3 Dore Road, Leicester, LE5 5HG",
+    "phone": "07459426888",
+    "charityNo": "1202989"
+  },
+  "menu": [
+    {
+      "id": "m1",
+      "label": "Home",
+      "url": "index.html",
+      "children": []
+    },
+    {
+      "id": "m2",
+      "label": "Activities",
+      "url": "#",
+      "children": [
+        {
+          "id": "m2-1",
+          "label": "Events",
+          "url": "#",
+          "children": [
+            {
+              "id": "m2-1-1",
+              "label": "New Events",
+              "url": "events.html",
+              "children": []
+            },
+            {
+              "id": "m2-1-2",
+              "label": "Archive",
+              "url": "#",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "m2-2",
+          "label": "Courses",
+          "url": "courses.html",
+          "children": []
+        },
+        {
+          "id": "m2-3",
+          "label": "Record Class",
+          "url": "record-class.html",
+          "children": []
+        },
+        {
+          "id": "m2-4",
+          "label": "Forms",
+          "url": "forms.html",
+          "children": []
+        },
+        {
+          "id": "m2-5",
+          "label": "Blog",
+          "url": "blog.html",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "m3",
+      "label": "Services",
+      "url": "services.html",
+      "children": [
+        {
+          "id": "m3-1",
+          "label": "Learning",
+          "url": "#",
+          "children": [
+            {
+              "id": "m3-1-1",
+              "label": "Quran",
+              "url": "courses.html",
+              "children": []
+            },
+            {
+              "id": "m3-1-2",
+              "label": "Islamic Culture",
+              "url": "services.html",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "m3-2",
+          "label": "Dawah Programme",
+          "url": "#",
+          "children": [
+            {
+              "id": "m3-2-1",
+              "label": "Muslim",
+              "url": "#",
+              "children": []
+            },
+            {
+              "id": "m3-2-2",
+              "label": "Non-Muslim",
+              "url": "#",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "m3-3",
+          "label": "Women Section",
+          "url": "#",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "m4",
+      "label": "About",
+      "url": "about.html",
+      "children": [
+        {
+          "id": "m4-1",
+          "label": "About Us",
+          "url": "#",
+          "children": [
+            {
+              "id": "m4-1-1",
+              "label": "Our Mission & Vision",
+              "url": "about.html",
+              "children": []
+            },
+            {
+              "id": "m4-1-2",
+              "label": "Policy",
+              "url": "privacy.html",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "m4-2",
+          "label": "Members",
+          "url": "#",
+          "children": [
+            {
+              "id": "m4-2-1",
+              "label": "Trustee",
+              "url": "member.html",
+              "children": []
+            },
+            {
+              "id": "m4-2-2",
+              "label": "Founder Member",
+              "url": "media-kit.html",
+              "children": []
+            },
+            {
+              "id": "m4-2-3",
+              "label": "Life Time Member",
+              "url": "life-member.html",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "m4-3",
+          "label": "Media",
+          "url": "#",
+          "children": [
+            {
+              "id": "m4-3-1",
+              "label": "Publication",
+              "url": "#",
+              "children": []
+            },
+            {
+              "id": "m4-3-2",
+              "label": "Media Kit",
+              "url": "media-kit.html",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "m4-4",
+          "label": "Notice Board",
+          "url": "notice.html",
+          "children": []
+        },
+        {
+          "id": "m4-5",
+          "label": "Vacancies",
+          "url": "#",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "m5",
+      "label": "Gallery",
+      "url": "#",
+      "children": [
+        {
+          "id": "m5-1",
+          "label": "Activities",
+          "url": "activities-gallery.html",
+          "children": []
+        },
+        {
+          "id": "m5-2",
+          "label": "Mosque View",
+          "url": "#",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "m6",
+      "label": "Contact",
+      "url": "contact.html",
+      "children": []
+    },
+    {
+      "id": "m7",
+      "label": "Times",
+      "url": "prayer-time.html",
+      "children": []
+    },
+    {
+      "id": "m8",
+      "label": "Donate",
+      "url": "donation.html",
+      "children": []
+    },
+    {
+      "id": "m9",
+      "label": "Live",
+      "url": "live.html",
+      "children": []
+    }
+  ],
+  "footer": {
+    "address": "3 Dore Road, Leicester, LE5 5HG",
+    "phone": "(+44) 07459426888",
+    "aboutText": "Khadijatul Kubra Trust – Islamic Dawah Centre & Mosque",
+    "facebook": "https://www.facebook.com/khadijatulkubra.mosque",
+    "twitter": "#",
+    "youtube": "https://www.youtube.com/@KhadijatulKubraMosque",
+    "instagram": "https://www.instagram.com/khadijatulkubra.mosque/",
+    "linksTitle": "Links",
+    "links": [
+      {
+        "id": "fl1",
+        "label": "About us",
+        "url": "about.html"
+      },
+      {
+        "id": "fl2",
+        "label": "Donate",
+        "url": "donation.html"
+      },
+      {
+        "id": "fl3",
+        "label": "Courses",
+        "url": "courses.html"
+      },
+      {
+        "id": "fl4",
+        "label": "Faq's",
+        "url": "faq.html"
+      },
+      {
+        "id": "fl5",
+        "label": "Site Map",
+        "url": "#"
+      }
+    ],
+    "otherTitle": "Other Link",
+    "otherLinks": [
+      {
+        "id": "fo1",
+        "label": "Record Class",
+        "url": "record-class.html"
+      },
+      {
+        "id": "fo2",
+        "label": "Audio Listening",
+        "url": "#"
+      },
+      {
+        "id": "fo3",
+        "label": "Prayer Time",
+        "url": "prayer-time.html"
+      },
+      {
+        "id": "fo4",
+        "label": "Our Events",
+        "url": "events.html"
+      },
+      {
+        "id": "fo5",
+        "label": "Forms",
+        "url": "forms.html"
+      }
+    ],
+    "newsletterTitle": "newsletter",
+    "newsletterText": "Waiting for your message is not your important time",
+    "copyright": "© Copyrights All rights reserved 2026 | www.khadijatulkubratrust.org",
+    "bottomLinks": [
+      {
+        "id": "fb1",
+        "label": "Developed By: Inventive Lab Inc",
+        "url": "https://inventivelab.bd"
+      },
+      {
+        "id": "fb2",
+        "label": "Terms of use",
+        "url": "#"
+      },
+      {
+        "id": "fb3",
+        "label": "Privacy Policy",
+        "url": "privacy.html"
+      }
+    ]
+  },
+  "pages": {
+    "index": {
+      "title": "Home",
+      "blocks": [
+        {
+          "key": "hero_eyebrow",
+          "label": "Hero Eyebrow",
+          "type": "text",
+          "value": "Khadijatul Kubra trust"
+        },
+        {
+          "key": "hero_title",
+          "label": "Hero Title",
+          "type": "text",
+          "value": "Islamic Dawah Centre & Mosque"
+        },
+        {
+          "key": "hero_text",
+          "label": "Hero Text",
+          "type": "textarea",
+          "value": "Islamic dawah centre in leicester and uk government Approved"
+        },
+        {
+          "key": "welcome_title",
+          "label": "Welcome Title",
+          "type": "text",
+          "value": "Welcome To Khadijatul Kubra Trust"
+        },
+        {
+          "key": "welcome_text",
+          "label": "Welcome Text",
+          "type": "textarea",
+          "value": "We welcome our users to Online Quran teaching services where we are offering multiple Islamic as well as character building and life reformation courses as per the teachings of Sharia."
+        },
+        {
+          "key": "welcome_subtext",
+          "label": "Welcome Sub Text",
+          "type": "textarea",
+          "value": "There are many variations of passages of lorem ipsum available, but the majority have suffered business consulting"
+        },
+        {
+          "key": "offer_eyebrow",
+          "label": "Offer Eyebrow",
+          "type": "text",
+          "value": "WHAT WE OFFER"
+        },
+        {
+          "key": "offer_title",
+          "label": "Offer Title",
+          "type": "text",
+          "value": "We offer an effective Arabic & Quran Services"
+        },
+        {
+          "key": "service_1_title",
+          "label": "Service 1 Title",
+          "type": "text",
+          "value": "Online Quran Classes"
+        },
+        {
+          "key": "service_1_text",
+          "label": "Service 1 Text",
+          "type": "textarea",
+          "value": "There are many variations of passages of lorem ipsum available lorem ipsum dolor sit amet"
+        },
+        {
+          "key": "service_2_title",
+          "label": "Service 2 Title",
+          "type": "text",
+          "value": "Tafseer Course"
+        },
+        {
+          "key": "service_2_text",
+          "label": "Service 2 Text",
+          "type": "textarea",
+          "value": "There are many variations of passages of lorem ipsum available lorem ipsum dolor sit amet"
+        },
+        {
+          "key": "service_3_title",
+          "label": "Service 3 Title",
+          "type": "text",
+          "value": "We Value Our Students"
+        },
+        {
+          "key": "service_3_text",
+          "label": "Service 3 Text",
+          "type": "textarea",
+          "value": "There are many variations of passages of lorem ipsum available lorem ipsum dolor sit amet"
+        },
+        {
+          "key": "cta_title",
+          "label": "CTA Title",
+          "type": "text",
+          "value": "Do not let Shaitan delay you from starting to learn your deen."
+        }
+      ]
+    },
+    "about": {
+      "title": "About",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "About Us"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Our Mission & Vision"
+        },
+        {
+          "key": "body_html",
+          "label": "Page Body Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "donation": {
+      "title": "Donate",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Donate"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Support our trust"
+        },
+        {
+          "key": "body_html",
+          "label": "Donation Page Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "contact": {
+      "title": "Contact",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Contact Us"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Get in touch"
+        },
+        {
+          "key": "body_html",
+          "label": "Contact Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "courses": {
+      "title": "Courses",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Our Courses"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Arabic & Islamic Courses"
+        },
+        {
+          "key": "body_html",
+          "label": "Courses Intro",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "events": {
+      "title": "Events",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Events"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Upcoming programmes"
+        },
+        {
+          "key": "body_html",
+          "label": "Events Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "services": {
+      "title": "Services",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Our Services"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "What we offer"
+        },
+        {
+          "key": "body_html",
+          "label": "Services Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "prayer-time": {
+      "title": "Prayer Times",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Prayer Times"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Daily salah timetable"
+        },
+        {
+          "key": "body_html",
+          "label": "Prayer Page Note",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "live": {
+      "title": "Live",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Live Stream"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Watch live"
+        },
+        {
+          "key": "body_html",
+          "label": "Live Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "blog": {
+      "title": "Blog",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Latest News & Articles"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "From the blog"
+        },
+        {
+          "key": "body_html",
+          "label": "Blog Intro",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "faq": {
+      "title": "FAQ",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "FAQ"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Common questions"
+        },
+        {
+          "key": "body_html",
+          "label": "FAQ Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "forms": {
+      "title": "Forms",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Forms"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Download & submit forms"
+        },
+        {
+          "key": "body_html",
+          "label": "Forms Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "member": {
+      "title": "Members",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Trustees & Members"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Our leadership"
+        },
+        {
+          "key": "body_html",
+          "label": "Members Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "notice": {
+      "title": "Notice Board",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Notice Board"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Official notices"
+        },
+        {
+          "key": "body_html",
+          "label": "Notice Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Privacy Policy"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "How we handle data"
+        },
+        {
+          "key": "body_html",
+          "label": "Policy Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "record-class": {
+      "title": "Record Class",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Record Class"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Recorded lessons"
+        },
+        {
+          "key": "body_html",
+          "label": "Record Class Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "activities-gallery": {
+      "title": "Gallery",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Activities Gallery"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Our moments"
+        },
+        {
+          "key": "body_html",
+          "label": "Gallery Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    },
+    "marriage": {
+      "title": "Marriage Registration",
+      "blocks": [
+        {
+          "key": "page_title",
+          "label": "Page Title",
+          "type": "text",
+          "value": "Marriage Registration"
+        },
+        {
+          "key": "page_subtitle",
+          "label": "Page Subtitle",
+          "type": "text",
+          "value": "Nikah registration form"
+        },
+        {
+          "key": "body_html",
+          "label": "Marriage Page Content",
+          "type": "html",
+          "value": ""
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-10-14T19:41:57.226Z"
+}

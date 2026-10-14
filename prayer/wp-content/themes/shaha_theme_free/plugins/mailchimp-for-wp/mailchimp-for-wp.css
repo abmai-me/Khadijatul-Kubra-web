@@ -1,0 +1,76 @@
+/* MailChimp for WP styles
+----------------------------------------------------------------- */
+.mc4wp-form {
+    position:relative;
+}
+.mc4wp-form .mc4wp-form-fields input[type="email"] {
+
+    width: 100%;
+    vertical-align:top;
+}
+.mc4wp-form .mc4wp-form-fields input[type="submit"] {
+    position: absolute;
+    z-index:1;
+    right: 0;
+    top: 0;
+    max-width:9.5em;
+    padding: 1.6em 2.1em;
+    vertical-align:top;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.mc4wp-form .mc4wp-form-fields input[type="email"],
+.mc4wp-form .mc4wp-form-fields input[type="submit"] {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.mc4wp-form .mc4wp-alert {
+    margin: 1em auto 0;
+    padding: 1em;
+    text-align: center;
+}
+
+
+/* Mail Chimp */
+.mc4wp-response,
+.mailchimp_form .mailchimp_inputs{
+    width: 35.81rem;
+    max-width: 90%;
+    margin: auto;
+}
+.mailchimp_form input,
+.mailchimp_form button{
+    height: 3.813rem;
+    display:inline-block;
+    box-sizing: border-box;
+}
+body .mailchimp_form input[type="email"] {
+    width: 100%;
+    min-width: 3rem;
+    margin-right: 0;
+    line-height: inherit;
+    border: none !important;
+    padding: 1em 2em;
+}
+.mailchimp_form button{
+    padding: 1em;
+    white-space: nowrap;
+    width: 9.563rem;
+    font-size: 1em;
+    border: none;
+    position: relative;
+}
+.mailchimp_form input[type="email"] + button{   margin-left:    -9.563rem;  }
+body .mailchimp_form input[type="email"] {      padding-right:  10.563rem;  }
+.mailchimp_form button {                        width:          9.563rem;   }
+
+@media (max-width: 479px) {
+    .mailchimp_form input[type="email"] + button{   margin-left:    -7.563rem;  }
+    body .mailchimp_form input[type="email"] {      padding-right:  8.563rem;  }
+    .mailchimp_form button {                        width:          7.563rem;   }
+}

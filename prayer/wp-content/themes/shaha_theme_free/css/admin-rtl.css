@@ -1,0 +1,45 @@
+
+/*************** core.admin.css ***************/
+.trx_addons_options_item_title{
+	float: right;
+}
+#trx_addons_options_tabs.with_tabs .trx_addons_options_section {
+	margin-left: 2em;
+	margin-right: 0;
+}
+.trx_addons_options_item_info .trx_addons_options_item_title {
+	text-align: right;
+}
+.wpb_content_element > .wpb_element_wrapper > .wpb_element_title .vc_element-icon {
+	float: right!important;
+	margin-left: 10px;
+	margin-right: 0!important;
+}
+
+/* customize */
+#customize-header-actions .customize-action-refresh {
+	right: 60px;
+}
+#customize-header-actions .customize-action-reset {
+	float: left!important;
+	margin: 0 6px 0 0!important;
+	max-width: 50px;
+}
+
+/* About Page */
+.shaha_about_title {
+    text-align: right;
+}
+.shaha_about_logo {
+    float: right;
+    margin: 0 0 1em  2em;
+}
+
+[class*="shaha_column-"] .shaha_options_item_data,
+[class*="shaha_column-"] .shaha_options_item_title {
+    text-align: right;
+}
+
+.meta-box-sortables select {
+	box-sizing: border-box;
+}

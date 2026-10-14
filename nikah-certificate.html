@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Download Nikah Nama PDF</title>
+  <link rel="shortcut icon" href="assets/images/favicon.png">
+  <style>
+    body { font-family: Lexend, Segoe UI, sans-serif; background:#eef5f0; margin:0; padding:40px 16px; color:#163025; }
+    .card { max-width:480px; margin:0 auto; background:#fff; border-radius:16px; padding:28px; box-shadow:0 10px 30px rgba(20,60,40,.1); text-align:center; }
+    a.btn, button.btn { display:inline-block; margin-top:14px; background:#1a7a4c; color:#fff; border:0; border-radius:8px; padding:12px 18px; font-weight:700; text-decoration:none; cursor:pointer; }
+    .muted { color:#5c7266; }
+    .err { color:#8a1f14; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Nikah Nama PDF</h1>
+    <p id="msg" class="muted">Preparing download…</p>
+    <a id="dl" class="btn" style="display:none" href="#">Download Official PDF</a>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+    const token = params.get("token") || "";
+    const msg = document.getElementById("msg");
+    const dl = document.getElementById("dl");
+
+    (async () => {
+      if (!id) {
+        msg.className = "err";
+        msg.textContent = "Missing certificate id.";
+        return;
+      }
+      try {
+        const metaUrl = token
+          ? `/api/public/marriages/${encodeURIComponent(id)}/certificate?token=${encodeURIComponent(token)}`
+          : `/api/marriages/${encodeURIComponent(id)}`;
+        const res = await fetch(metaUrl, { credentials: "include" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Not available");
+        if (data.status !== "approved") {
+          msg.className = "err";
+          msg.textContent = "Still waiting for admin approval. PDF unlocks after approval.";
+          return;
+        }
+        const pdfUrl = token
+          ? `/api/public/marriages/${encodeURIComponent(id)}/pdf?token=${encodeURIComponent(token)}`
+          : `/api/marriages/${encodeURIComponent(id)}/pdf`;
+        msg.textContent = `${data.certificateNo} is approved. Download the official filled Nikah Nama PDF.`;
+        dl.href = pdfUrl;
+        dl.style.display = "inline-block";
+        if (params.get("autodownload") === "1") location.href = pdfUrl;
+      } catch (e) {
+        msg.className = "err";
+        msg.textContent = e.message || "Could not load certificate";
+      }
+    })();
+  </script>
+</body>
+</html>

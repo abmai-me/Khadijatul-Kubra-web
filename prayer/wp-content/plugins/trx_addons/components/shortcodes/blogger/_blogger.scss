@@ -1,0 +1,272 @@
+/* Shortcode: Blogger */
+.sc_blogger {
+	position: relative;	
+	padding-top: 0.0001px;
+}
+
+.sc_blogger .trx_addons_loading {
+	@include abs-cover(1000);
+	background-color: rgba(255,255,255,0.75);
+}
+
+.sc_blogger_columns_wrap {
+	@include flex;
+	@include flex-wrap(wrap);
+}
+
+.sc_blogger_slider .sc_blogger_item,
+.sc_blogger_columns_wrap .sc_blogger_item {
+	display:inline-block;
+	vertical-align:top;
+	@include box(100%, 100%);
+	@include border-box;
+}
+.sc_blogger_slider .sc_blogger_item {
+	margin-bottom: 0 !important;
+}
+.sc_blogger .sc_blogger_slider.slider_outer_pagination_pos_bottom {
+	padding-bottom: 3em;
+}
+
+.sc_blogger .sc_blogger_item_align_center .sc_blogger_item_header,
+.sc_blogger .sc_blogger_item_align_center .sc_blogger_item_content,
+.sc_blogger .sc_blogger_item_align_center .sc_blogger_item_footer {
+	text-align: center;
+}
+.sc_blogger .sc_blogger_item_align_right .sc_blogger_item_header,
+.sc_blogger .sc_blogger_item_align_right .sc_blogger_item_content,
+.sc_blogger .sc_blogger_item_align_right .sc_blogger_item_footer {
+	text-align: right;
+}
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_odd.sc_blogger_item_align_right .sc_blogger_item_header,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_odd.sc_blogger_item_align_right .sc_blogger_item_content,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_odd.sc_blogger_item_align_right .sc_blogger_item_footer,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_even.sc_blogger_item_align_left .sc_blogger_item_header,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_even.sc_blogger_item_align_left .sc_blogger_item_content,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_even.sc_blogger_item_align_left .sc_blogger_item_footer {
+	text-align: right;
+}
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_odd.sc_blogger_item_align_left .sc_blogger_item_header,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_odd.sc_blogger_item_align_left .sc_blogger_item_content,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_odd.sc_blogger_item_align_left .sc_blogger_item_footer,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_even.sc_blogger_item_align_right .sc_blogger_item_header,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_even.sc_blogger_item_align_right .sc_blogger_item_content,
+.sc_blogger.sc_blogger_image_position_alter .sc_blogger_item_even.sc_blogger_item_align_right .sc_blogger_item_footer {
+	text-align: left;
+}
+
+.sc_blogger .sc_blogger_item_header {
+	margin-bottom: 1em;
+}
+.sc_blogger .sc_blogger_item_title {
+	margin:0;
+}
+.sc_blogger .sc_blogger_post_meta {
+	@include font(0.9286em, 1.5em, 400, italic);
+	margin-top: 0.4em;
+}
+.sc_blogger .sc_blogger_item_featured {
+	margin-bottom:0;
+}
+.sc_blogger .sc_blogger_item_featured img {
+	@include box(100%, auto);
+}
+.sc_blogger .post_meta_categories {
+	margin: 0 0 0.5em;
+}
+.sc_blogger .sc_blogger_item_title + .sc_blogger_item_excerpt,
+.sc_blogger .sc_blogger_item_meta + .sc_blogger_item_excerpt {
+	margin-top: 1em;
+}
+.sc_blogger .sc_blogger_item_excerpt_text {
+	max-height: 8em;
+	line-height:1.6em;
+	overflow:hidden;
+}
+.sc_blogger .sc_blogger_item_excerpt_text p {
+	margin:0;
+}
+.sc_blogger .sc_blogger_item.post_format_quote .sc_blogger_item_excerpt_text {
+	max-height: none;
+}
+.sc_blogger .sc_blogger_item_excerpt_text + p,
+.sc_blogger .sc_blogger_item_excerpt_text + a {
+	margin: 1.5em 0 0;
+}
+.sc_blogger blockquote {
+	margin: 1em 0;
+}
+.sc_blogger blockquote p {
+	@include font(1em, 1.5em, inherit);
+}
+.sc_blogger .sc_blogger_item_title + .sc_blogger_item_button,
+.sc_blogger .sc_blogger_item_meta + .sc_blogger_item_button,
+.sc_blogger .sc_blogger_item_excerpt + .sc_blogger_item_button {
+	margin-top:1em;
+}
+.sc_blogger .more-link {
+	background-color: transparent;
+}
+.sc_blogger .sc_blogger_item_footer {
+	margin-top: 1em;
+}
+
+
+/* Type: Default
+---------------------------------------------------------- */
+.sc_blogger_default .sc_blogger_content .sc_blogger_item + .sc_blogger_item {
+	margin-top: 2em;
+}
+
+.sc_blogger_default.sc_blogger_image_position_top .sc_blogger_item_featured + .sc_blogger_item_content {
+	margin-top: 1em;
+}
+.sc_blogger_default.sc_blogger_image_position_left .sc_blogger_item_body,
+.sc_blogger_default.sc_blogger_image_position_right .sc_blogger_item_body,
+.sc_blogger_default.sc_blogger_image_position_alter .sc_blogger_item_body {
+	overflow:hidden;
+	@include flex;
+	@include flex-direction(row);
+	@include flex-wrap(nowrap);
+	@include flex-align-items(center);
+}
+.sc_blogger_default.sc_blogger_image_position_left .sc_blogger_item_content,
+.sc_blogger_default.sc_blogger_image_position_alter .sc_blogger_item_odd .sc_blogger_item_content {
+	padding-left: 2em;
+	@include border-box;
+}
+.sc_blogger_default.sc_blogger_image_position_right .sc_blogger_item_featured,
+.sc_blogger_default.sc_blogger_image_position_alter .sc_blogger_item_even .sc_blogger_item_featured {
+	order: 2;
+}
+.sc_blogger_default.sc_blogger_image_position_right .sc_blogger_item_content,
+.sc_blogger_default.sc_blogger_image_position_alter .sc_blogger_item_even .sc_blogger_item_content {
+	padding-right: 2em;
+	@include border-box;
+}
+
+.sc_blogger_default.sc_blogger_on_plate .sc_blogger_item_body {
+	background-color: #f7f7f7;
+}
+.sc_blogger_default.sc_blogger_on_plate .sc_blogger_item_content {
+	padding: 1.5em;
+}
+.sc_blogger_default.sc_blogger_on_plate.sc_blogger_image_position_top .sc_blogger_item_featured + .sc_blogger_item_content {
+	margin-top: 0;
+}
+.sc_blogger_default.sc_blogger_on_plate .sc_blogger_item_excerpt {
+	height: 7em;
+	overflow: hidden;
+	position: relative;
+}
+.sc_blogger_default.sc_blogger_on_plate .sc_blogger_item_excerpt:after {
+	content: ' ';
+	@include abs-lb;
+	width: 100%;
+	height: 2em;
+	background-image: -webkit-gradient(linear,left top,left bottom,from(rgba(255,255,255,0)),to(#f7f7f7));
+	background-image: -webkit-linear-gradient(top,rgba(255,255,255,0),#f7f7f7);
+	background-image: -o-linear-gradient(top,rgba(255,255,255,0),#f7f7f7);
+	background-image: linear-gradient(180deg,rgba(255,255,255,0),#f7f7f7);	
+}
+.sc_blogger_default.sc_blogger_on_plate .sc_blogger_content .sc_blogger_item_excerpt,
+.sc_blogger_default.sc_blogger_on_plate .sc_blogger_masonry_wrap .sc_blogger_item_excerpt {
+	height: unset;
+	overflow: unset;
+}
+.sc_blogger_default.sc_blogger_on_plate .sc_blogger_content .sc_blogger_item_excerpt:after,
+.sc_blogger_default.sc_blogger_on_plate .sc_blogger_masonry_wrap .sc_blogger_item_excerpt:after {
+	display: none;
+}
+
+
+
+/* Type: List
+---------------------------------------------------------- */
+
+/* Common styles */
+.sc_blogger_list .sc_blogger_content .sc_blogger_item + .sc_blogger_item {
+	margin-top: 1em;
+	padding-top: 1em;
+	border-top: 1px solid #ddd;
+}
+.sc_blogger_list.sc_blogger_image_position_top .sc_blogger_content .sc_blogger_item + .sc_blogger_item {
+	margin-top: 2em;
+	padding-top: 0;
+	border-top: none;
+}
+
+.sc_blogger_list.sc_blogger_image_position_top .sc_blogger_item_featured + .sc_blogger_item_content {
+	margin-top: 1em;
+}
+
+/* On plate */
+.sc_blogger_list.sc_blogger_on_plate .sc_blogger_content .sc_blogger_item + .sc_blogger_item {
+	padding-top: 0;
+	border-top: none;
+}
+.sc_blogger_list.sc_blogger_on_plate .sc_blogger_item_body {
+	background-color: #f7f7f7;
+}
+.sc_blogger_list.sc_blogger_on_plate .sc_blogger_item_content {
+	padding: 1em;
+}
+.sc_blogger_list.sc_blogger_on_plate.sc_blogger_image_position_top .sc_blogger_item_featured + .sc_blogger_item_content {
+	margin-top: 0;
+}
+
+/* With numbers */
+.sc_blogger_list.sc_blogger_with_numbers:not(.sc_blogger_with_image) .sc_blogger_item_content > * {
+	padding-left: 2rem;
+}
+.sc_blogger_list.sc_blogger_with_numbers:not(.sc_blogger_with_image) .sc_blogger_item_title {
+	position: relative;
+}
+.sc_blogger_list.sc_blogger_with_numbers:not(.sc_blogger_with_image) .sc_blogger_item_title:before,
+.sc_blogger_list.sc_blogger_with_numbers.sc_blogger_with_image .sc_blogger_item_featured:after {
+	content: attr(data-item-number);
+	display: block;
+	@include square(1.5em);
+	@include border-round;
+	background-color: #333;
+	color: #fff;
+	@include font(10px, 15px);
+}
+.sc_blogger_list.sc_blogger_with_numbers:not(.sc_blogger_with_image) .sc_blogger_item_title:before {
+	@include abs-lc;
+}
+.sc_blogger_list.sc_blogger_with_numbers.sc_blogger_with_image .sc_blogger_item_featured {
+	overflow: visible;
+}
+.sc_blogger_list.sc_blogger_with_numbers.sc_blogger_with_image.sc_blogger_image_position_left .sc_blogger_item_featured:after,
+.sc_blogger_list.sc_blogger_with_numbers.sc_blogger_with_image.sc_blogger_image_position_alter .sc_blogger_item_even .sc_blogger_item_featured:after {
+	@include abs-lc(-0.75em);
+}
+.sc_blogger_list.sc_blogger_with_numbers.sc_blogger_with_image.sc_blogger_image_position_right .sc_blogger_item_featured:after,
+.sc_blogger_list.sc_blogger_with_numbers.sc_blogger_with_image.sc_blogger_image_position_alter .sc_blogger_item_odd .sc_blogger_item_featured:after {
+	@include abs-rc(-0.75em);
+}
+
+/* With image */
+.sc_blogger_list.sc_blogger_with_image.sc_blogger_image_position_left .sc_blogger_item_body,
+.sc_blogger_list.sc_blogger_with_image.sc_blogger_image_position_right .sc_blogger_item_body,
+.sc_blogger_list.sc_blogger_with_image.sc_blogger_image_position_alter .sc_blogger_item_body {
+	@include flex;
+	@include flex-direction(row);
+	@include flex-wrap(nowrap);
+	@include flex-align-items(center);
+}
+.sc_blogger_list.sc_blogger_with_image.sc_blogger_image_position_left .sc_blogger_item_content,
+.sc_blogger_list.sc_blogger_with_image.sc_blogger_image_position_alter .sc_blogger_item_odd .sc_blogger_item_content {
+	padding-left: 1em;
+	@include border-box;
+}
+.sc_blogger_list.sc_blogger_with_image.sc_blogger_image_position_right .sc_blogger_item_featured,
+.sc_blogger_list.sc_blogger_with_image.sc_blogger_image_position_alter .sc_blogger_item_even .sc_blogger_item_featured {
+	order: 2;
+}
+.sc_blogger_list.sc_blogger_with_image.sc_blogger_image_position_right .sc_blogger_item_content,
+.sc_blogger_list.sc_blogger_with_image.sc_blogger_image_position_alter .sc_blogger_item_even .sc_blogger_item_content {
+	padding-right: 1em;
+	@include border-box;
+}

@@ -1,0 +1,365 @@
+$flaticon_afbd3404a2e1104832d0-font: "flaticon_afbd3404a2e1104832d0";
+
+@font-face {
+    font-family: $flaticon_afbd3404a2e1104832d0-font;
+    src: url("./flaticon_afbd3404a2e1104832d0.ttf?b0f7f2ab595e7c81a5ca08b7b21a530e") format("truetype"),
+url("./flaticon_afbd3404a2e1104832d0.woff?b0f7f2ab595e7c81a5ca08b7b21a530e") format("woff"),
+url("./flaticon_afbd3404a2e1104832d0.woff2?b0f7f2ab595e7c81a5ca08b7b21a530e") format("woff2"),
+url("./flaticon_afbd3404a2e1104832d0.eot?b0f7f2ab595e7c81a5ca08b7b21a530e#iefix") format("embedded-opentype"),
+url("./flaticon_afbd3404a2e1104832d0.svg?b0f7f2ab595e7c81a5ca08b7b21a530e#flaticon_afbd3404a2e1104832d0") format("svg");
+}
+
+i[class^="flaticon-"]:before, i[class*=" flaticon-"]:before {
+    font-family: flaticon_afbd3404a2e1104832d0 !important;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+$flaticon_afbd3404a2e1104832d0-map: (
+    "up-right-arrow": "\f101",
+    "nabawi-mosque": "\f102",
+    "send": "\f103",
+    "search-interface-symbol": "\f104",
+    "user": "\f105",
+    "quran": "\f106",
+    "iso": "\f107",
+    "islamic": "\f108",
+    "mosque": "\f109",
+    "globe": "\f10a",
+    "quran-1": "\f10b",
+    "pray": "\f10c",
+    "quran-2": "\f10d",
+    "give": "\f10e",
+    "star": "\f10f",
+    "star-1": "\f110",
+    "pray-1": "\f111",
+    "education": "\f112",
+    "time-management": "\f113",
+    "book": "\f114",
+    "quran-3": "\f115",
+    "boy": "\f116",
+    "quran-4": "\f117",
+    "quran-5": "\f118",
+    "quran-6": "\f119",
+    "read": "\f11a",
+    "padlock": "\f11b",
+    "check-mark": "\f11c",
+    "phone-call": "\f11d",
+    "call": "\f11e",
+    "smartphone": "\f11f",
+    "phone": "\f120",
+    "telephone": "\f121",
+    "plus": "\f122",
+    "minus": "\f123",
+    "maps-and-flags": "\f124",
+    "envelope": "\f125",
+    "email": "\f126",
+    "shopping-cart": "\f127",
+    "shopping-cart-1": "\f128",
+    "shopping-bag": "\f129",
+    "facebook-app-symbol": "\f12a",
+    "twitter": "\f12b",
+    "linkedin": "\f12c",
+    "pinterest": "\f12d",
+    "dribbble-logo": "\f12e",
+    "behance": "\f12f",
+    "instagram": "\f130",
+    "whatsapp": "\f131",
+    "tik-tok": "\f132",
+    "snapchat": "\f133",
+    "islam": "\f134",
+    "mosque-1": "\f135",
+    "mosque-2": "\f136",
+    "quran-7": "\f137",
+    "praying": "\f138",
+    "islamic-lantern": "\f139",
+    "address": "\f13a",
+    "mosque-3": "\f13b",
+    "hijab": "\f13c",
+    "allah": "\f13d",
+    "praying-1": "\f13e",
+    "mosque-4": "\f13f",
+    "next": "\f140",
+    "next-1": "\f141",
+    "back": "\f142",
+    "left-arrow": "\f143",
+    "share": "\f144",
+    "share-1": "\f145",
+    "menu": "\f146",
+    "dots-menu": "\f147",
+    "visualization": "\f148",
+    "close": "\f149",
+    "close-1": "\f14a",
+    "down-arrow": "\f14b",
+    "arrow-up": "\f14c",
+    "right-up": "\f14d",
+    "up-arrow": "\f14e",
+    "up-arrows": "\f14f",
+    "up-arrow-1": "\f150",
+    "left-quote": "\f151",
+    "right-quote": "\f152",
+    "play": "\f153",
+    "play-button": "\f154",
+    "play-1": "\f155",
+);
+
+.flaticon-up-right-arrow:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "up-right-arrow");
+}
+.flaticon-nabawi-mosque:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "nabawi-mosque");
+}
+.flaticon-send:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "send");
+}
+.flaticon-search-interface-symbol:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "search-interface-symbol");
+}
+.flaticon-user:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "user");
+}
+.flaticon-quran:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "quran");
+}
+.flaticon-iso:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "iso");
+}
+.flaticon-islamic:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "islamic");
+}
+.flaticon-mosque:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "mosque");
+}
+.flaticon-globe:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "globe");
+}
+.flaticon-quran-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "quran-1");
+}
+.flaticon-pray:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "pray");
+}
+.flaticon-quran-2:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "quran-2");
+}
+.flaticon-give:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "give");
+}
+.flaticon-star:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "star");
+}
+.flaticon-star-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "star-1");
+}
+.flaticon-pray-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "pray-1");
+}
+.flaticon-education:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "education");
+}
+.flaticon-time-management:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "time-management");
+}
+.flaticon-book:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "book");
+}
+.flaticon-quran-3:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "quran-3");
+}
+.flaticon-boy:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "boy");
+}
+.flaticon-quran-4:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "quran-4");
+}
+.flaticon-quran-5:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "quran-5");
+}
+.flaticon-quran-6:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "quran-6");
+}
+.flaticon-read:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "read");
+}
+.flaticon-padlock:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "padlock");
+}
+.flaticon-check-mark:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "check-mark");
+}
+.flaticon-phone-call:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "phone-call");
+}
+.flaticon-call:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "call");
+}
+.flaticon-smartphone:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "smartphone");
+}
+.flaticon-phone:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "phone");
+}
+.flaticon-telephone:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "telephone");
+}
+.flaticon-plus:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "plus");
+}
+.flaticon-minus:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "minus");
+}
+.flaticon-maps-and-flags:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "maps-and-flags");
+}
+.flaticon-envelope:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "envelope");
+}
+.flaticon-email:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "email");
+}
+.flaticon-shopping-cart:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "shopping-cart");
+}
+.flaticon-shopping-cart-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "shopping-cart-1");
+}
+.flaticon-shopping-bag:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "shopping-bag");
+}
+.flaticon-facebook-app-symbol:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "facebook-app-symbol");
+}
+.flaticon-twitter:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "twitter");
+}
+.flaticon-linkedin:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "linkedin");
+}
+.flaticon-pinterest:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "pinterest");
+}
+.flaticon-dribbble-logo:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "dribbble-logo");
+}
+.flaticon-behance:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "behance");
+}
+.flaticon-instagram:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "instagram");
+}
+.flaticon-whatsapp:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "whatsapp");
+}
+.flaticon-tik-tok:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "tik-tok");
+}
+.flaticon-snapchat:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "snapchat");
+}
+.flaticon-islam:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "islam");
+}
+.flaticon-mosque-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "mosque-1");
+}
+.flaticon-mosque-2:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "mosque-2");
+}
+.flaticon-quran-7:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "quran-7");
+}
+.flaticon-praying:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "praying");
+}
+.flaticon-islamic-lantern:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "islamic-lantern");
+}
+.flaticon-address:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "address");
+}
+.flaticon-mosque-3:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "mosque-3");
+}
+.flaticon-hijab:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "hijab");
+}
+.flaticon-allah:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "allah");
+}
+.flaticon-praying-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "praying-1");
+}
+.flaticon-mosque-4:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "mosque-4");
+}
+.flaticon-next:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "next");
+}
+.flaticon-next-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "next-1");
+}
+.flaticon-back:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "back");
+}
+.flaticon-left-arrow:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "left-arrow");
+}
+.flaticon-share:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "share");
+}
+.flaticon-share-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "share-1");
+}
+.flaticon-menu:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "menu");
+}
+.flaticon-dots-menu:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "dots-menu");
+}
+.flaticon-visualization:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "visualization");
+}
+.flaticon-close:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "close");
+}
+.flaticon-close-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "close-1");
+}
+.flaticon-down-arrow:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "down-arrow");
+}
+.flaticon-arrow-up:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "arrow-up");
+}
+.flaticon-right-up:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "right-up");
+}
+.flaticon-up-arrow:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "up-arrow");
+}
+.flaticon-up-arrows:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "up-arrows");
+}
+.flaticon-up-arrow-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "up-arrow-1");
+}
+.flaticon-left-quote:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "left-quote");
+}
+.flaticon-right-quote:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "right-quote");
+}
+.flaticon-play:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "play");
+}
+.flaticon-play-button:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "play-button");
+}
+.flaticon-play-1:before {
+    content: map-get($flaticon_afbd3404a2e1104832d0-map, "play-1");
+}

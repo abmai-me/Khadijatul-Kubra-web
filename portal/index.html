@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CRM Portal | Khadijatul Kubra Trust</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/portal.css">
+  <link rel="shortcut icon" href="../assets/images/favicon.png">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="../assets/images/logo.png" alt="Logo">
+        <div>
+          <strong>KKT Portal</strong>
+          <span>Organisation CRM</span>
+        </div>
+      </div>
+      <button class="nav-link active" data-view="dashboard" data-module="dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</button>
+      <button class="nav-link" data-view="students" data-module="students"><i class="fa-solid fa-user-graduate"></i> Students</button>
+      <button class="nav-link" data-view="donations" data-module="donations"><i class="fa-solid fa-hand-holding-heart"></i> Donations</button>
+      <button class="nav-link" data-view="collections" data-module="collections"><i class="fa-solid fa-calculator"></i> Collection Hisab</button>
+      <button class="nav-link" data-view="prayer" data-module="prayer"><i class="fa-solid fa-mosque"></i> Prayer Times</button>
+      <button class="nav-link" data-view="marriage" data-module="marriage"><i class="fa-solid fa-ring"></i> Marriage</button>
+      <button class="nav-link" data-view="content" data-module="content"><i class="fa-solid fa-wand-magic-sparkles"></i> Website Builder</button>
+      <div class="sidebar-foot">
+        <button class="nav-link" id="settingsBtn" data-view="settings" data-module="users" data-action="manage"><i class="fa-solid fa-gear"></i> Settings</button>
+        <a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Website</a>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="appbar">
+        <div class="appbar-brand">
+          <span>Khadijatul Kubra Trust</span>
+          <strong>Admin Portal</strong>
+        </div>
+        <div class="profile-wrap">
+          <button type="button" class="profile-btn" id="profileBtn" aria-haspopup="true" aria-expanded="false">
+            <span class="avatar" id="profileAvatar">A</span>
+            <span class="profile-meta">
+              <strong id="profileLabel">Account</strong>
+              <small id="profileRole">—</small>
+            </span>
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="profile-menu hidden" id="profileMenu">
+            <div class="profile-summary">
+              <span class="avatar" id="menuAvatar">A</span>
+              <div>
+                <strong id="menuName">Account</strong>
+                <span class="menu-user" id="menuUsername">@admin</span>
+                <span class="role-pill" id="menuRole">Admin</span>
+              </div>
+            </div>
+            <button type="button" id="editProfileBtn"><i class="fa-solid fa-user-pen"></i> Edit profile</button>
+            <button type="button" id="logoutMenuBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+          </div>
+        </div>
+      </header>
+
+    <main class="main">
+      <div id="noAccess" class="card hidden">
+        <h3>No access yet</h3>
+        <p class="muted">An admin can open Settings and choose what this account is allowed to do.</p>
+      </div>
+      <!-- Dashboard -->
+      <section class="view active" id="view-dashboard">
+        <div class="topbar">
+          <div>
+            <h2>Dashboard</h2>
+            <p>Welcome to Khadijatul Kubra Trust admin portal</p>
+          </div>
+        </div>
+        <div class="grid stats">
+          <div class="card stat-card"><h3 id="statStudents">0</h3><span>Students</span></div>
+          <div class="card stat-card"><h3 id="statDonations">£0</h3><span>Donation Total</span></div>
+          <div class="card stat-card"><h3 id="statCollections">£0</h3><span>Collection Hisab</span></div>
+          <div class="card stat-card"><h3 id="statMarriages">0</h3><span>Marriage Applications</span></div>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <h3>Today's Prayer Times</h3>
+          <div class="grid stats" id="dashPrayer" style="margin-top:12px"></div>
+        </div>
+      </section>
+
+      <!-- Students -->
+      <section class="view" id="view-students">
+        <div class="topbar">
+          <div>
+            <h2>Students / Madrasah</h2>
+            <p>Manage student registrations and courses</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="panel-head">
+            <h3>Student List</h3>
+            <button class="btn btn-primary" id="addStudentBtn"><i class="fa-solid fa-plus"></i> Add Student</button>
+          </div>
+          <form id="studentForm" class="form-grid hidden" style="margin-bottom:18px">
+            <input type="hidden" id="studentId">
+            <div class="form-group"><label>Full Name</label><input id="studentName" required></div>
+            <div class="form-group"><label>Phone</label><input id="studentPhone"></div>
+            <div class="form-group"><label>Email</label><input id="studentEmail" type="email"></div>
+            <div class="form-group"><label>Course</label><input id="studentCourse" placeholder="Quran / Hifz / Arabic"></div>
+            <div class="form-group"><label>Gender</label>
+              <select id="studentGender"><option value="">Select</option><option>Male</option><option>Female</option></select>
+            </div>
+            <div class="form-group"><label>Status</label>
+              <select id="studentStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+            </div>
+            <div class="form-group full"><label>Notes</label><textarea id="studentNotes"></textarea></div>
+            <div class="full actions">
+              <button class="btn btn-primary" type="submit">Save Student</button>
+              <button class="btn btn-secondary" type="button" id="cancelStudent">Cancel</button>
+            </div>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Course</th><th>Phone</th><th>Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="studentsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Donations -->
+      <section class="view" id="view-donations">
+        <div class="topbar">
+          <div>
+            <h2>Donations</h2>
+            <p>Record donations and receipts</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="panel-head">
+            <h3>Donation Entries</h3>
+            <button class="btn btn-primary" id="addDonationBtn"><i class="fa-solid fa-plus"></i> Add Donation</button>
+          </div>
+          <form id="donationForm" class="form-grid hidden" style="margin-bottom:18px">
+            <div class="form-group"><label>Donor Name</label><input id="donorName" required></div>
+            <div class="form-group"><label>Amount (£)</label><input id="donationAmount" type="number" step="0.01" required></div>
+            <div class="form-group"><label>Phone</label><input id="donorPhone"></div>
+            <div class="form-group"><label>Email</label><input id="donorEmail" type="email"></div>
+            <div class="form-group"><label>Method</label>
+              <select id="donationMethod"><option>cash</option><option>bank</option><option>card</option><option>online</option></select>
+            </div>
+            <div class="form-group"><label>Purpose</label><input id="donationPurpose" value="General"></div>
+            <div class="form-group"><label>Date</label><input id="donationDate" type="date"></div>
+            <div class="form-group"><label>Receipt No</label><input id="donationReceipt" placeholder="Auto if empty"></div>
+            <div class="form-group full"><label>Notes</label><textarea id="donationNotes"></textarea></div>
+            <div class="full actions">
+              <button class="btn btn-primary" type="submit">Save Donation</button>
+              <button class="btn btn-secondary" type="button" id="cancelDonation">Cancel</button>
+            </div>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Date</th><th>Donor</th><th>Amount</th><th>Method</th><th>Purpose</th><th>Receipt</th><th></th></tr>
+              </thead>
+              <tbody id="donationsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Collections -->
+      <section class="view" id="view-collections">
+        <div class="topbar">
+          <div>
+            <h2>Donation Collection Hisab</h2>
+            <p>Income / expense ledger for collections</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="panel-head">
+            <h3>Ledger</h3>
+            <button class="btn btn-primary" id="addCollectionBtn"><i class="fa-solid fa-plus"></i> Add Entry</button>
+          </div>
+          <form id="collectionForm" class="form-grid hidden" style="margin-bottom:18px">
+            <div class="form-group"><label>Title</label><input id="collectionTitle" required></div>
+            <div class="form-group"><label>Amount (£)</label><input id="collectionAmount" type="number" step="0.01" required></div>
+            <div class="form-group"><label>Type</label>
+              <select id="collectionType"><option value="income">Income</option><option value="expense">Expense</option></select>
+            </div>
+            <div class="form-group"><label>Category</label><input id="collectionCategory" value="Donation collection"></div>
+            <div class="form-group"><label>Date</label><input id="collectionDate" type="date"></div>
+            <div class="form-group full"><label>Notes</label><textarea id="collectionNotes"></textarea></div>
+            <div class="full actions">
+              <button class="btn btn-primary" type="submit">Save Entry</button>
+              <button class="btn btn-secondary" type="button" id="cancelCollection">Cancel</button>
+            </div>
+          </form>
+          <p class="muted" id="collectionSummary"></p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Date</th><th>Title</th><th>Type</th><th>Category</th><th>Amount</th><th></th></tr>
+              </thead>
+              <tbody id="collectionsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Prayer -->
+      <section class="view" id="view-prayer">
+        <div class="topbar">
+          <div>
+            <h2>Prayer Time Table</h2>
+            <p>Update mosque prayer times (also used on website)</p>
+          </div>
+        </div>
+        <div class="card">
+          <form id="prayerForm" class="form-grid">
+            <div class="form-group"><label>Fajr</label><input id="fajr" type="time"></div>
+            <div class="form-group"><label>Sunrise</label><input id="sunrise" type="time"></div>
+            <div class="form-group"><label>Dhuhr</label><input id="dhuhr" type="time"></div>
+            <div class="form-group"><label>Asr</label><input id="asr" type="time"></div>
+            <div class="form-group"><label>Maghrib</label><input id="maghrib" type="time"></div>
+            <div class="form-group"><label>Isha</label><input id="isha" type="time"></div>
+            <div class="form-group"><label>Jumu'ah</label><input id="jumuah" type="time"></div>
+            <div class="full actions">
+              <button class="btn btn-primary" type="submit">Save Prayer Times</button>
+            </div>
+          </form>
+          <p class="muted" id="prayerUpdated" style="margin-top:12px"></p>
+        </div>
+      </section>
+
+      <!-- Marriage -->
+      <section class="view" id="view-marriage">
+        <div class="topbar">
+          <div>
+            <h2>Marriage / Nikah Nama</h2>
+            <p>Public applications, edit/correction, approval &amp; download</p>
+          </div>
+          <a class="btn btn-secondary" href="/nikah-nama.html" target="_blank"><i class="fa-solid fa-up-right-from-square"></i> Public Form</a>
+        </div>
+        <div class="card no-print">
+          <div class="panel-head">
+            <h3>Applications</h3>
+            <button class="btn btn-primary" id="addMarriageBtn"><i class="fa-solid fa-plus"></i> New Registration</button>
+          </div>
+          <form id="marriageForm" class="hidden" style="margin-bottom:18px">
+            <input type="hidden" id="marriageId">
+
+            <div class="form-section">
+              <h4 class="form-section-title">1. Certificate &amp; Status</h4>
+              <div class="form-grid">
+                <div class="form-group"><label>Certificate No</label><input id="certificateNo" placeholder="Auto"></div>
+                <div class="form-group"><label>Status</label>
+                  <select id="marriageStatus">
+                    <option value="pending">Waiting</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Applicant Name</label><input id="applicantName"></div>
+                <div class="form-group"><label>Applicant Mobile</label><input id="applicantMobile"></div>
+                <div class="form-group full"><label>Applicant Email</label><input id="applicantEmail" type="email"></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4 class="form-section-title">2. Bride Groom Details</h4>
+              <div class="form-grid">
+                <div class="form-group"><label>First Name</label><input id="groomFirstName" required></div>
+                <div class="form-group"><label>Last Name</label><input id="groomLastName" required></div>
+                <div class="form-group"><label>DOB (DD)</label><input id="groomDobDay" maxlength="2"></div>
+                <div class="form-group"><label>DOB (MM)</label><input id="groomDobMonth" maxlength="2"></div>
+                <div class="form-group"><label>DOB (YYYY)</label><input id="groomDobYear" maxlength="4"></div>
+                <div class="form-group"><label>Nationality</label><input id="groomNationality"></div>
+                <div class="form-group"><label>Place of Birth</label><input id="groomPlaceOfBirth"></div>
+                <div class="form-group"><label>Father's Name</label><input id="groomFather"></div>
+                <div class="form-group"><label>Mother's Name</label><input id="groomMother"></div>
+                <div class="form-group full"><label>Present Address</label><textarea id="groomAddress"></textarea></div>
+                <div class="form-group"><label>Mobile</label><input id="groomMobile"></div>
+                <div class="form-group"><label>Phone</label><input id="groomPhone"></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4 class="form-section-title">3. Bride Details</h4>
+              <div class="form-grid">
+                <div class="form-group"><label>First Name</label><input id="brideFirstName" required></div>
+                <div class="form-group"><label>Last Name</label><input id="brideLastName" required></div>
+                <div class="form-group"><label>DOB (DD)</label><input id="brideDobDay" maxlength="2"></div>
+                <div class="form-group"><label>DOB (MM)</label><input id="brideDobMonth" maxlength="2"></div>
+                <div class="form-group"><label>DOB (YYYY)</label><input id="brideDobYear" maxlength="4"></div>
+                <div class="form-group"><label>Nationality</label><input id="brideNationality"></div>
+                <div class="form-group"><label>Place of Birth</label><input id="bridePlaceOfBirth"></div>
+                <div class="form-group"><label>Father's Name</label><input id="brideFather"></div>
+                <div class="form-group"><label>Mother's Name</label><input id="brideMother"></div>
+                <div class="form-group full"><label>Present Address</label><textarea id="brideAddress"></textarea></div>
+                <div class="form-group"><label>Mobile</label><input id="brideMobile"></div>
+                <div class="form-group"><label>Phone</label><input id="bridePhone"></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4 class="form-section-title">4. Marriage Details</h4>
+              <div class="form-grid">
+                <div class="form-group"><label>Marriage Day</label><input id="marriageDay" maxlength="2"></div>
+                <div class="form-group"><label>Marriage Month</label><input id="marriageMonth" maxlength="2"></div>
+                <div class="form-group"><label>Marriage Year</label><input id="marriageYear" maxlength="4"></div>
+                <div class="form-group"><label>Place of Marriage</label><input id="placeOfMarriage" value="Khadijatul Kubra Trust Mosque, Leicester"></div>
+                <div class="form-group"><label>Dowry Amount (£)</label><input id="dowryAmount"></div>
+                <div class="form-group"><label>Dowry Cash (£)</label><input id="dowryCash"></div>
+                <div class="form-group"><label>Dowry Jewellery (£)</label><input id="dowryJewellery"></div>
+                <div class="form-group"><label>Dowry Land &amp; Property (£)</label><input id="dowryLand"></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4 class="form-section-title">5. Proposer</h4>
+              <div class="form-grid">
+                <div class="form-group"><label>Name</label><input id="proposerName"></div>
+                <div class="form-group"><label>Mobile</label><input id="proposerMobile"></div>
+                <div class="form-group full"><label>Address</label><input id="proposerAddress"></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4 class="form-section-title">6. Witnesses</h4>
+              <div class="form-grid">
+                <div class="form-group"><label>Witness 1 Name</label><input id="witness1Name"></div>
+                <div class="form-group"><label>Witness 2 Name</label><input id="witness2Name"></div>
+                <div class="form-group full"><label>Witness 1 Address</label><textarea id="witness1Address"></textarea></div>
+                <div class="form-group full"><label>Witness 2 Address</label><textarea id="witness2Address"></textarea></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4 class="form-section-title">7. Certifier</h4>
+              <div class="form-grid">
+                <div class="form-group"><label>Certifier Name</label><input id="certifierName"></div>
+                <div class="form-group"><label>Date (DD)</label><input id="certifyDay" maxlength="2"></div>
+                <div class="form-group"><label>Date (MM)</label><input id="certifyMonth" maxlength="2"></div>
+                <div class="form-group"><label>Date (YYYY)</label><input id="certifyYear" maxlength="4"></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4 class="form-section-title">8. Admin Notes</h4>
+              <div class="form-grid">
+                <div class="form-group full"><label>Correction / Notes</label><textarea id="marriageNotes"></textarea></div>
+                <div class="full actions">
+                  <button class="btn btn-primary" type="submit">Save / Correct</button>
+                  <button class="btn btn-gold" type="button" id="approveMarriageBtn">Approve &amp; Unlock Download</button>
+                  <button class="btn btn-secondary" type="button" id="cancelMarriage">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <div id="marriageViewModal" class="modal-overlay hidden">
+            <div class="modal-card">
+              <div class="panel-head">
+                <h3 id="marriageViewTitle">Application Details</h3>
+                <button type="button" class="btn btn-secondary btn-sm" id="closeMarriageView">Close</button>
+              </div>
+              <div id="marriageViewBody"></div>
+            </div>
+          </div>
+
+          <div id="marriageApproveModal" class="modal-overlay hidden">
+            <div class="modal-card" style="max-width:420px">
+              <div class="panel-head">
+                <h3>Approve &amp; Set PIN</h3>
+                <button type="button" class="btn btn-secondary btn-sm" id="closeApproveModal">Close</button>
+              </div>
+              <p class="muted" style="margin:0 0 12px">Set a download PIN. Applicant will use this PIN on the track page to download the PDF.</p>
+              <input type="hidden" id="approveMarriageId">
+              <div class="form-grid">
+                <div class="form-group full">
+                  <label>Download PIN</label>
+                  <input id="approveDownloadPin" inputmode="numeric" maxlength="8" placeholder="e.g. 482915">
+                </div>
+              </div>
+              <div class="actions" style="margin-top:14px">
+                <button type="button" class="btn btn-secondary" id="genApprovePinBtn">Generate PIN</button>
+                <button type="button" class="btn btn-gold" id="confirmApproveBtn">Approve</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="marriageSmsModal" class="modal-overlay hidden">
+            <div class="modal-card" style="max-width:480px">
+              <div class="panel-head">
+                <h3>Send PIN</h3>
+                <button type="button" class="btn btn-secondary btn-sm" id="closeSmsModal">Close</button>
+              </div>
+              <p class="muted" id="smsPinPreview" style="margin:0 0 12px"></p>
+              <p class="muted" style="margin:0 0 12px">Defaults come from the online form contact details — edit before sending if needed.</p>
+              <input type="hidden" id="smsMarriageId">
+              <div class="form-grid">
+                <div class="form-group full">
+                  <label>Name</label>
+                  <input id="smsName" type="text" placeholder="Applicant name">
+                </div>
+                <div class="form-group full">
+                  <label>Mobile Number</label>
+                  <input id="smsMobile" type="tel" placeholder="Edit number before sending">
+                </div>
+                <div class="form-group full">
+                  <label>Email</label>
+                  <input id="smsEmail" type="email" placeholder="Edit email before sending">
+                </div>
+              </div>
+              <div class="actions" style="margin-top:14px">
+                <button type="button" class="btn btn-primary" id="confirmSmsBtn">Send SMS</button>
+                <button type="button" class="btn btn-gold" id="confirmEmailBtn">Send Email</button>
+              </div>
+              <p id="smsStatus" class="muted" style="margin:12px 0 0"></p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Certificate</th><th>Groom</th><th>Bride</th><th>Date</th><th>Source</th><th>Status</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="marriagesTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Website Builder -->
+      <section class="view" id="view-content">
+        <div class="topbar">
+          <div>
+            <h2>Website Builder</h2>
+            <p>Edit menu, page body, and footer — changes go live after save</p>
+            <p class="muted" id="cmsUpdatedAt"></p>
+          </div>
+          <a class="btn btn-gold" href="/" target="_blank"><i class="fa-solid fa-eye"></i> Preview Site</a>
+        </div>
+        <div id="builderToast" class="alert alert-error hidden" style="background:#e5f3ed;color:var(--main-color)"></div>
+
+        <div class="builder-tabs">
+          <button type="button" class="builder-tab active" data-tab="header">Header</button>
+          <button type="button" class="builder-tab" data-tab="menu">Menu + Dropdown</button>
+          <button type="button" class="builder-tab" data-tab="pages">All Pages Body</button>
+          <button type="button" class="builder-tab" data-tab="footer">Footer</button>
+        </div>
+
+        <div class="builder-panel active card" id="builder-header">
+          <div class="panel-head">
+            <h3>Top Header Bar</h3>
+            <button class="btn btn-primary" id="saveHeaderBtn" type="button">Save Header (Live)</button>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label>Email</label><input id="cmsEmail"></div>
+            <div class="form-group"><label>Phone</label><input id="cmsPhone"></div>
+            <div class="form-group full"><label>Address</label><input id="cmsAddress"></div>
+            <div class="form-group"><label>Charity No</label><input id="cmsCharity"></div>
+          </div>
+        </div>
+
+        <div class="builder-panel card" id="builder-menu">
+          <div class="panel-head">
+            <h3>Main Menu (dropdown / sub-menu supported)</h3>
+            <div class="actions">
+              <button class="btn btn-secondary" id="addTopMenuBtn" type="button">+ Top Item</button>
+              <button class="btn btn-primary" id="saveMenuBtn" type="button">Save Menu (Live)</button>
+            </div>
+          </div>
+          <p class="muted">Use + Sub to create dropdown menus. Nested sub-menus are supported.</p>
+          <div id="menuEditor"></div>
+        </div>
+
+        <div class="builder-panel card" id="builder-pages">
+          <div class="panel-head">
+            <h3 id="pageEditorTitle">Page Content</h3>
+            <div class="actions">
+              <button class="btn btn-secondary" id="addCmsPageBtn" type="button">+ New Page</button>
+              <button class="btn btn-primary" id="savePageBtn" type="button">Save Page (Live)</button>
+            </div>
+          </div>
+          <div id="pageList" class="page-list"></div>
+          <div id="pageEditor" style="margin-top:16px"></div>
+        </div>
+
+        <div class="builder-panel card" id="builder-footer">
+          <div class="panel-head">
+            <h3>Footer</h3>
+            <button class="btn btn-primary" id="saveFooterBtn" type="button">Save Footer (Live)</button>
+          </div>
+          <div class="form-grid">
+            <div class="form-group full"><label>Address</label><input id="ftAddress"></div>
+            <div class="form-group"><label>Phone</label><input id="ftPhone"></div>
+            <div class="form-group"><label>About text</label><input id="ftAbout"></div>
+            <div class="form-group"><label>Facebook</label><input id="ftFacebook"></div>
+            <div class="form-group"><label>Twitter</label><input id="ftTwitter"></div>
+            <div class="form-group"><label>YouTube</label><input id="ftYoutube"></div>
+            <div class="form-group"><label>Instagram</label><input id="ftInstagram"></div>
+            <div class="form-group"><label>Links title</label><input id="ftLinksTitle"></div>
+            <div class="form-group"><label>Other links title</label><input id="ftOtherTitle"></div>
+            <div class="form-group"><label>Newsletter title</label><input id="ftNewsTitle"></div>
+            <div class="form-group full"><label>Newsletter text</label><input id="ftNewsText"></div>
+            <div class="form-group full"><label>Copyright</label><input id="ftCopyright"></div>
+            <div class="form-group full"><label>Links JSON [{label,url,id}]</label><textarea id="ftLinksJson" rows="5"></textarea></div>
+            <div class="form-group full"><label>Other Links JSON</label><textarea id="ftOtherJson" rows="5"></textarea></div>
+            <div class="form-group full"><label>Bottom Links JSON</label><textarea id="ftBottomJson" rows="4"></textarea></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-settings">
+        <div class="topbar">
+          <div>
+            <h2>Settings</h2>
+            <p>Users, personal details, and access control</p>
+          </div>
+        </div>
+
+        <div class="settings-shell">
+          <aside class="settings-nav">
+            <button type="button" class="settings-nav-btn active" data-settings-panel="profile">
+              <i class="fa-solid fa-id-card"></i>
+              <span>Profile</span>
+              <small>My account details</small>
+            </button>
+            <button type="button" class="settings-nav-btn" data-settings-panel="users">
+              <i class="fa-solid fa-users"></i>
+              <span>Users</span>
+              <small>List · Add · Personal info</small>
+            </button>
+            <button type="button" class="settings-nav-btn" data-settings-panel="access">
+              <i class="fa-solid fa-user-shield"></i>
+              <span>User Access</span>
+              <small>Role · Permissions</small>
+            </button>
+          </aside>
+
+          <div class="settings-panels">
+            <div class="settings-panel active" id="settings-panel-profile">
+              <div class="card settings-card">
+                <div class="panel-head">
+                  <div>
+                    <h3>My profile</h3>
+                    <p class="muted">Your current account information</p>
+                  </div>
+                  <button class="btn btn-primary" type="button" id="settingsEditProfileBtn"><i class="fa-solid fa-pen"></i> Edit</button>
+                </div>
+                <div class="profile-view">
+                  <div class="photo-panel">
+                    <div class="photo-frame" id="myProfilePhotoFrame">
+                      <img id="myProfilePhoto" class="hidden" alt="Profile photo">
+                      <span id="myProfilePhotoPlaceholder"><i class="fa-solid fa-user"></i></span>
+                    </div>
+                    <span class="role-pill" id="myProfileRole">—</span>
+                  </div>
+                  <div class="detail-grid profile-detail-grid">
+                    <div class="detail-item"><span>Full name</span><strong id="myProfileName">—</strong></div>
+                    <div class="detail-item"><span>Username</span><strong id="myProfileUsername">—</strong></div>
+                    <div class="detail-item"><span>Mobile</span><strong id="myProfileMobile">—</strong></div>
+                    <div class="detail-item"><span>Email</span><strong id="myProfileEmail">—</strong></div>
+                    <div class="detail-item"><span>Date of birth</span><strong id="myProfileDob">—</strong></div>
+                    <div class="detail-item"><span>Phone</span><strong id="myProfilePhone">—</strong></div>
+                    <div class="detail-item"><span>Gender</span><strong id="myProfileGender">—</strong></div>
+                    <div class="detail-item"><span>Access</span><strong id="myProfileAccess">—</strong></div>
+                    <div class="detail-item full"><span>Address</span><strong id="myProfileAddress">—</strong></div>
+                    <div class="detail-item full"><span>Notes</span><strong id="myProfileNotes">—</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-panel" id="settings-panel-users">
+              <div id="userError" class="alert alert-error hidden"></div>
+
+              <div class="card settings-card">
+                <div class="panel-head">
+                  <div>
+                    <h3>User list</h3>
+                    <p class="muted">All portal users and their personal information</p>
+                  </div>
+                  <button class="btn btn-primary" id="newUserBtn" type="button"><i class="fa-solid fa-user-plus"></i> Add user</button>
+                </div>
+                <div class="table-wrap">
+                  <table class="user-table">
+                    <thead>
+                      <tr>
+                        <th>User</th>
+                        <th>Mobile</th>
+                        <th>Date of birth</th>
+                        <th>Gender</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody id="userRoster"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card settings-card" id="userEditorCard">
+                <div class="panel-head">
+                  <div>
+                    <h3 id="userEditorTitle">Add user</h3>
+                    <p class="muted" id="userEditorHint">Personal details, photo and login only</p>
+                  </div>
+                  <button class="btn btn-secondary hidden" type="button" id="cancelUserEdit">Cancel</button>
+                </div>
+
+                <form id="userForm">
+                  <input type="hidden" id="editUserId">
+                  <input type="hidden" id="userPhotoData">
+                  <input type="hidden" id="userPhotoCleared" value="0">
+
+                  <div class="user-editor-grid">
+                    <div class="photo-panel">
+                      <div class="photo-frame" id="userPhotoFrame">
+                        <img id="userPhotoPreview" class="hidden" alt="User photo">
+                        <span id="userPhotoPlaceholder"><i class="fa-solid fa-camera"></i></span>
+                      </div>
+                      <div class="actions photo-actions">
+                        <label class="btn btn-secondary" for="userPhotoInput"><i class="fa-solid fa-image"></i> Choose photo</label>
+                        <input id="userPhotoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+                        <button class="btn btn-danger" type="button" id="clearUserPhoto">Remove</button>
+                      </div>
+                      <p class="muted">JPG / PNG / WebP · under 900KB</p>
+                    </div>
+
+                    <div>
+                      <h4 class="section-label">Personal details</h4>
+                      <div class="form-grid">
+                        <div class="form-group"><label>Full name</label><input id="userName" required></div>
+                        <div class="form-group"><label>Mobile</label><input id="userMobile" placeholder="07…"></div>
+                        <div class="form-group"><label>Email</label><input id="userEmail" type="email"></div>
+                        <div class="form-group"><label>Phone</label><input id="userPhone"></div>
+                        <div class="form-group"><label>Date of birth</label><input id="userDob" type="date"></div>
+                        <div class="form-group"><label>Gender</label>
+                          <select id="userGender">
+                            <option value="">Select</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                          </select>
+                        </div>
+                        <div class="form-group full"><label>Address</label><textarea id="userAddress" rows="2"></textarea></div>
+                        <div class="form-group full"><label>Notes</label><textarea id="userNotes" rows="2"></textarea></div>
+                      </div>
+
+                      <h4 class="section-label">Login</h4>
+                      <div class="form-grid">
+                        <div class="form-group"><label>Username</label><input id="userUsername" required autocomplete="off"></div>
+                        <div class="form-group"><label>Password</label><input id="userPassword" type="password" autocomplete="new-password" placeholder="Required for a new user"></div>
+                      </div>
+                      <p class="muted">To set permissions, open <strong>User Access</strong>.</p>
+
+                      <div class="actions" style="margin-top:16px">
+                        <button class="btn btn-primary" type="submit" id="saveUserBtn">Save user</button>
+                        <button class="btn btn-danger hidden" type="button" id="deleteUserBtn">Delete user</button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="settings-panel" id="settings-panel-access">
+              <div id="accessError" class="alert alert-error hidden"></div>
+
+              <div class="card settings-card">
+                <div class="panel-head">
+                  <div>
+                    <h3>User Access</h3>
+                    <p class="muted">Select a user to set their role and permissions</p>
+                  </div>
+                </div>
+
+                <div class="access-layout">
+                  <div>
+                    <h4 class="section-label" style="margin-top:0">Select user</h4>
+                    <div id="accessUserList" class="user-list"></div>
+                  </div>
+                  <form id="accessForm">
+                    <input type="hidden" id="accessUserId">
+                    <div class="access-user-head">
+                      <div class="user-cell">
+                        <span class="user-avatar-sm" id="accessUserAvatar">?</span>
+                        <div>
+                          <strong id="accessUserName">Select a user</strong>
+                          <div class="muted" id="accessUserMeta">—</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-grid" style="margin-top:14px">
+                      <div class="form-group"><label>Role</label>
+                        <select id="accessRole">
+                          <option value="staff">Staff — only selected access</option>
+                          <option value="admin">Admin — full access</option>
+                        </select>
+                      </div>
+                    </div>
+                    <p class="muted" id="adminAccessNote">Tick what this user can do. Admin always has everything.</p>
+                    <div id="accessGrid" class="access-grid"></div>
+                    <div class="actions" style="margin-top:16px">
+                      <button class="btn btn-primary" type="submit" id="saveAccessBtn" disabled>Save access</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    </div>
+  </div>
+
+  <div id="accountModal" class="modal-overlay hidden">
+    <div class="modal-card account-card">
+      <div class="panel-head">
+        <div>
+          <h3 id="accountModalTitle">Edit profile</h3>
+          <p class="muted" id="accountModalHint"></p>
+        </div>
+        <button type="button" class="btn btn-secondary" id="closeAccountModal">Close</button>
+      </div>
+      <div id="accountError" class="alert alert-error hidden"></div>
+
+      <form id="profileForm">
+        <input type="hidden" id="profilePhotoData">
+        <input type="hidden" id="profilePhotoCleared" value="0">
+        <div class="profile-edit-layout">
+          <div class="photo-panel compact">
+            <div class="photo-frame" id="profilePhotoFrame">
+              <img id="profilePhotoPreview" class="hidden" alt="Profile photo">
+              <span id="profilePhotoPlaceholder"><i class="fa-solid fa-camera"></i></span>
+            </div>
+            <div class="actions photo-actions">
+              <label class="btn btn-secondary" for="profilePhotoInput"><i class="fa-solid fa-image"></i> Photo</label>
+              <input id="profilePhotoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+              <button class="btn btn-danger" type="button" id="clearProfilePhoto">Remove</button>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label>Full name</label><input id="profileName" required></div>
+            <div class="form-group"><label>Mobile</label><input id="profileMobile"></div>
+            <div class="form-group"><label>Email</label><input id="profileEmail" type="email"></div>
+            <div class="form-group"><label>Date of birth</label><input id="profileDob" type="date"></div>
+            <div class="form-group"><label>Username</label><input id="profileUsername" required autocomplete="username"></div>
+            <div class="form-group"><label>Current password</label><input id="profileCurrentPassword" type="password" autocomplete="current-password" placeholder="Needed only to change password"></div>
+            <div class="form-group full"><label>New password</label><input id="profileNewPassword" type="password" autocomplete="new-password" placeholder="Leave blank to keep"></div>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:8px">
+          <button class="btn btn-primary" type="submit">Save profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/portal.js"></script>
+  <script src="js/builder.js"></script>
+</body>
+</html>

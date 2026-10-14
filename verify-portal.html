@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nikah Nama Verification Portal | Khadijatul Kubra Trust</title>
+  <link rel="shortcut icon" href="assets/images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --g:#1a7a4c; --d:#145c39; --bg:#eef5f0; --border:#d5e4da; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:Lexend,sans-serif; background:var(--bg); color:#163025; }
+    .wrap { max-width:560px; margin:40px auto; padding:0 16px; }
+    .card { background:#fff; border-radius:16px; padding:28px; box-shadow:0 10px 30px rgba(20,60,40,.1); }
+    .logo { width:96px; display:block; margin:0 auto 12px; }
+    h1 { text-align:center; font-size:1.25rem; margin:0 0 6px; color:var(--d); }
+    .sub { text-align:center; color:#5c7266; margin:0 0 20px; font-size:.92rem; }
+    label { display:block; font-size:.8rem; font-weight:700; color:var(--d); margin-bottom:4px; }
+    .row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; }
+    input { width:100%; border:1px solid var(--border); border-radius:8px; padding:10px 12px; font:inherit; }
+    button, .btn {
+      border:0; border-radius:8px; padding:11px 16px; font-weight:700; cursor:pointer; font:inherit;
+      background:var(--g); color:#fff; text-decoration:none; display:inline-block;
+    }
+    .btn-secondary { background:#e8efe9; color:var(--d); }
+    .badge { display:inline-block; padding:6px 12px; border-radius:999px; font-weight:700; font-size:.85rem; margin-bottom:14px; }
+    .ok { background:#e5f6ec; color:#145c39; }
+    .wait { background:#fff6db; color:#8a6d00; }
+    .bad { background:#fdecea; color:#8a1f14; }
+    .err { color:#8a1f14; text-align:center; margin-top:12px; }
+    .result { margin-top:18px; display:none; text-align:center; }
+    .result.show { display:block; }
+    .line { display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid #e5efe9; font-size:.95rem; text-align:left; }
+    .line span { color:#5c7266; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:16px; }
+  </style>
+<!-- Site chrome -->
+<link href="assets/css/bootstrap.css" rel="stylesheet">
+<link href="assets/css/style.css" rel="stylesheet">
+<link href="assets/css/responsive.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<style>
+  body.tool-page { background: #eef5f1 !important; }
+  body.tool-page .page-wrapper { overflow: visible; }
+  body.tool-page .tool-main { padding-bottom: 20px; }
+  body.tool-page .main-footer { margin-top: 20px; }
+</style>
+
+</head>
+<body class="tool-page">
+<div class="page-wrapper">
+	<header class="main-header">
+		
+		<!-- Header Top -->
+		<div class="header-top">
+			<div class="auto-container">
+				<div class="inner-container">
+					<div class="d-flex justify-content-between align-items-center flex-wrap">
+						<div class="left-box d-flex align-items-center flex-wrap">
+							<!-- Info List -->
+							<ul class="header-top_list">
+								<li><span class="icon fa-solid fa-envelope fa-fw"></span>info@khadijatulkubratrust.org</li>
+								<li><span class="icon fa-solid fa-location-dot fa-fw"></span>3 Dore Road, Leicester, LE5 5HG</li>
+							</ul>
+							<div class="bismillah"><img src="assets/images/icons/bismillah.png" alt="" /> </div>
+						</div>
+						<ul class="header-top_list-two">
+
+							<li><span class="icon fa-solid fa-phone fa-fw"></span>Let’s Talk: 07459426888</li>
+							<li><span class="icon fa-regular fa-sun fa-fw"></span>Charity No: 1202989</li>
+							<li><span class="icon fa-solid fa-envelope fa-fw"></span><a href="mailto:info@khadijatulkubratrust.org" style="color:white;">Mail</a></li>
+						
+							
+							
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Header Upper -->
+		<div class="header-upper">
+			<div class="auto-container">
+				<div class="inner-container">
+					<div class="d-flex justify-content-between align-items-center flex-wrap">
+						
+						<div class="logo-box">
+							<div class="logo"><a href="index.html"><img src="assets/images/logo.png" alt="" title=""></a></div>
+						</div>
+						
+						<div class="nav-outer">
+							<!-- Main Menu -->
+							<nav class="main-menu navbar-expand-md">
+								<div class="navbar-header">
+									<!-- Toggle Button -->    	
+									<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+									</button>
+								</div>
+								
+								<div class="navbar-collapse collapse clearfix" id="navbarSupportedContent">
+									<ul class="navigation clearfix">
+										<li><a href="index.html">Home</a></li>
+										<li class="dropdown"><a href="#">Activities</a>
+											<ul>
+											<li class="dropdown"><a href="#">Events</a>
+												<ul>
+												<li><a href="events.html">New Events</a></li>
+												<li><a href="#">Archive</a></li>
+												</ul>
+											</li>
+											<li><a href="courses.html">Courses</a></li>
+											<li><a href="record-class.html">Record Class</a></li>
+											<li><a href="forms.html">Forms</a></li>
+											<li><a href="blog.html">Blog</a></li>
+											</ul>
+										</li>
+										<li class="dropdown"><a href="services.html">Services</a>
+											<ul>
+											<li class="dropdown"><a href="#">Learning</a>
+												<ul>
+												<li><a href="courses.html">Quran</a></li>
+												<li><a href="services.html">Islamic Culture</a></li>
+												</ul>
+											</li>
+											<li class="dropdown"><a href="#">Dawah Programme</a>
+												<ul>
+												<li><a href="#">Muslim</a></li>
+												<li><a href="#">Non-Muslim</a></li>
+												</ul>
+											</li>
+											<li><a href="#">Women Section</a></li>
+											</ul>
+										</li>
+										<li class="dropdown"><a href="about.html">About</a>
+											<ul>
+											<li class="dropdown"><a href="#">About Us</a>
+												<ul>
+												<li><a href="about.html">Our Mission &amp; Vision</a></li>
+												<li><a href="privacy.html">Policy</a></li>
+												</ul>
+											</li>
+											<li class="dropdown"><a href="#">Members</a>
+												<ul>
+												<li><a href="member.html">Trustee</a></li>
+												<li><a href="media-kit.html">Founder Member</a></li>
+												<li><a href="life-member.html">Life Time Member</a></li>
+												</ul>
+											</li>
+											<li class="dropdown"><a href="#">Media</a>
+												<ul>
+												<li><a href="#">Publication</a></li>
+												<li><a href="media-kit.html">Media Kit</a></li>
+												</ul>
+											</li>
+											<li><a href="notice.html">Notice Board</a></li>
+											<li><a href="#">Vacancies</a></li>
+											</ul>
+										</li>
+										<li class="dropdown"><a href="#">Gallery</a>
+											<ul>
+											<li><a href="activities-gallery.html">Activities</a></li>
+											<li><a href="#">Mosque View</a></li>
+											</ul>
+										</li>
+										<li><a href="contact.html">Contact</a></li>
+										<li><a href="prayer-time.html">Times</a></li>
+										<li><a href="donation.html">Donate</a></li>
+										<li><a href="live.html">Live</a></li>
+									</ul>
+								</div>
+							</nav>
+						</div>
+						
+						<!-- Main Menu End-->
+						<div class="outer-box d-flex align-items-center flex-wrap">
+							<!-- Mobile Navigation Toggler -->
+							<div class="mobile-nav-toggler"><span class="icon flaticon-menu"></span></div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--End Header Upper-->
+		
+		<!-- Mobile Menu  -->
+		<div class="mobile-menu">
+			<div class="menu-backdrop"></div>
+			<div class="close-btn"><span class="icon flaticon-close-1"></span></div>
+			
+			<nav class="menu-box">
+				<div class="nav-logo"><a href="index.html"><img src="assets/images/logo.png" alt="" title=""></a></div>
+				<div class="menu-outer"><!--Here Menu Will Come Automatically Via Javascript / Same Menu as in Header--></div>
+			</nav>
+		</div>
+		<!-- End Mobile Menu -->
+	
+	</header>
+<div class="tool-main">
+<div class="wrap">
+    <div class="card">
+      <img class="logo" src="assets/images/logo.png" alt="KKT">
+      <h1>Verification Portal</h1>
+      <p class="sub">Enter Certificate Number to verify an approved Nikah Nama</p>
+      <div class="row">
+        <div>
+          <label>Certificate No</label>
+          <input id="certNo" placeholder="NN-XXXXXXXX">
+        </div>
+        <button type="button" id="verifyBtn">Verify</button>
+      </div>
+      <p id="err" class="err" style="display:none"></p>
+      <div id="result" class="result"></div>
+      <div class="actions">
+        <a class="btn btn-secondary" href="track-nikah.html">Track Application</a>
+        <a class="btn btn-secondary" href="forms.html">Forms</a>
+      </div>
+    </div>
+  </div>
+</div>
+	<footer class="main-footer">
+		<div class="footer_bg-image" style="background-image: url(assets/images/background/footer-bg.jpg)"></div>
+		<div class="auto-container">
+			<div class="inner-container">
+				<!-- Widgets Section -->
+				<div class="widgets-section">
+					<div class="row clearfix">
+						
+						<!-- Big Column -->
+						<div class="big-column col-lg-6 col-md-12 col-sm-12">
+							<div class="row clearfix">
+
+								<!-- Footer Column -->
+								<div class="footer-column col-lg-6 col-md-6 col-sm-12">
+									<div class="footer-widget logo-widget">
+										<div class="footer-logo"><a href="index.html"><img src="assets/images/logow.png" alt="" title=""></a></div>
+										<!-- Footer List -->
+										<div class="footer_list">
+											<li>3 Dore Road, Leicester, LE5 5HG</li>
+											<li>(+44) 07459426888</li>
+										</div>
+										
+										<!-- Social Box -->
+										<div class="footer_socials">
+											<a href="https://www.facebook.com/khadijatulkubra.mosque"><i class="fa-brands fa-facebook-f"></i></a>
+											<a href="#"><i class="fa-brands fa-twitter"></i></a>
+											<a href="https://www.youtube.com/@KhadijatulKubraMosque"><i class="fa-brands fa-youtube"></i></a>
+											<a href="https://www.instagram.com/khadijatulkubra.mosque/"><i class="fa-brands fa-instagram"></i></a>
+										</div>
+									</div>
+								</div>
+
+								<!-- Footer Column -->
+								<div class="footer-column col-lg-6 col-md-6 col-sm-12">
+									<div class="footer-widget links-widget">
+										<h4 class="footer-title">Links</h4>
+										<ul class="footer-list">
+											<li><a href="about.html">About us</a></li>
+											<li><a href="donation.html">Donate</a></li>
+											<li><a href="courses.html">Courses</a></li>
+											<li><a href="faq.html">Faq's</a></li>
+											<li><a href="#">Site Map</a></li>
+										</ul>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+						<!-- Big Column -->
+						<div class="big-column col-lg-6 col-md-12 col-sm-12">
+							<div class="row clearfix">
+
+								<!-- Footer Column -->
+								<div class="footer-column col-lg-6 col-md-6 col-sm-12">
+									<div class="footer-widget links-widget">
+										<h4 class="footer-title">Other Link</h4>
+										<ul class="footer-list">
+											<li><a href="record-class.html">Record Class</a></li>
+											<li><a href="#">Audio Listening</a></li>
+											<li><a href="prayer-time.html">Prayer Time</a></li>
+											<li><a href="events.html">Our Events</a></li>
+											<li><a href="forms.html">Forms</a></li>
+										</ul>
+									</div>
+								</div>
+
+								<!-- Footer Column -->
+								<div class="footer-column col-lg-6 col-md-6 col-sm-12">
+									<div class="footer-widget newsletter-widget">
+										<h4 class="footer-title">newsletter</h4>
+										<div class="footer-text">Waiting for your message is not your important time</div>
+										<div class="newsletter-box">
+											<form method="post" action="contact.html">
+												<div class="form-group">
+													<input type="email" name="search-field" value="" placeholder="email address" required>
+													<button type="submit" class="theme-btn fa-regular fa-paper-plane fa-fw"></button>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="footer-bottom">
+			<div class="footer_bottom-bg" style="background-image: url(assets/images/background/footer-bg_2.jpg)"></div>
+			<div class="auto-container">
+				<div class="d-flex justify-content-between align-items-center flex-wrap">
+					<div class="copyright"> © Copyrights All rights reserved 2026 | www.khadijatulkubratrust.org </div>
+					<ul class="footer-nav">
+						<li><a href="https://inventivelab.com.bd">Developed By: Inventive Lab Inc</a></li>
+						<li><a href="#">Terms of use</a></li>
+						<li><a href="privacy.html">Privacy Policy</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		
+	</footer>
+</div>
+
+<script src="assets/js/jquery.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/appear.js"></script>
+<script src="assets/js/wow.js"></script>
+<script src="assets/js/nav-tool.js"></script>
+<script src="assets/js/script.js"></script>
+<script src="assets/js/site-cms.js"></script>
+
+<script>
+    const params = new URLSearchParams(location.search);
+    const certNo = document.getElementById("certNo");
+    const err = document.getElementById("err");
+    const result = document.getElementById("result");
+    if (params.get("c")) certNo.value = params.get("c");
+
+    function esc(v) {
+      return String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    }
+
+    async function verify() {
+      err.style.display = "none";
+      result.classList.remove("show");
+      const c = certNo.value.trim();
+      if (!c) {
+        err.textContent = "Enter Certificate No.";
+        err.style.display = "block";
+        return;
+      }
+      try {
+        const res = await fetch(`/api/public/marriages/verify?c=${encodeURIComponent(c)}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Not found");
+        if (data.verified) {
+          result.innerHTML = `
+            <span class="badge ok">VERIFIED · APPROVED</span>
+            <div class="line"><span>Certificate No</span><strong>${esc(data.certificateNo)}</strong></div>
+            <div class="line"><span>Groom</span><strong>${esc(data.groomName)}</strong></div>
+            <div class="line"><span>Bride</span><strong>${esc(data.brideName)}</strong></div>
+            <div class="line"><span>Marriage Date</span><strong>${esc(data.marriageDate)}</strong></div>
+            <div class="line"><span>Place</span><strong>${esc(data.placeOfMarriage)}</strong></div>
+            <p class="sub" style="margin-top:14px;margin-bottom:0">${esc(data.message)}</p>
+          `;
+        } else {
+          const badge = data.status === "rejected" ? "bad" : "wait";
+          const label = data.status === "pending" ? "WAITING" : String(data.status || "NOT APPROVED").toUpperCase();
+          result.innerHTML = `
+            <span class="badge ${badge}">${esc(label)}</span>
+            <div class="line"><span>Certificate No</span><strong>${esc(data.certificateNo)}</strong></div>
+            <p class="sub" style="margin-top:14px;margin-bottom:0">${esc(data.message || "Not verified")}</p>
+          `;
+        }
+        result.classList.add("show");
+        history.replaceState(null, "", `?c=${encodeURIComponent(c)}`);
+      } catch (e) {
+        err.textContent = e.message || "Verification failed";
+        err.style.display = "block";
+      }
+    }
+
+    document.getElementById("verifyBtn").addEventListener("click", verify);
+    certNo.addEventListener("keydown", (e) => { if (e.key === "Enter") verify(); });
+    if (params.get("c")) verify();
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+Version 1.1.2
+    	Added:
+    		- Compatibility with WP 5.2.2
+
+        Fixed:
+            - Update plugins to their latest versions
+
+        Changed:
+    		- Update demo data
+
+Version 1.1.1
+    	Added:
+    		- Compatibility with WP 5.1.1
+    		- Compatibility with PHP7.3
+
+        Fixed:
+            - Update plugins to their latest versions
+            - Improve theme styles
+            - Update scripts  libraries
+
+        Changed:
+    		- Update demo data
+
+Version 1.1
+    	Added:
+    		- Compatibility with WP 5.0.2
+    		- Compatibility with PHP7
+    		- WP GDPR Compliance plugin
+            - Contact Form 7
+            - Alert to Demo data installation
+            - Privacy Policy page
+
+        Fixed:
+            - Compatibility with Gutenberg and other PageBuilders
+            - Update plugins to their latest versions
+            - Improve theme styles
+
+        Changed:
+            - Update default contact forms to make them GDPR-compliant
+    		- Update demo data
+
+
+Version 1.0
+    Release

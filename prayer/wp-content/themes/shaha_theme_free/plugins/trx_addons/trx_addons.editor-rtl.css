@@ -1,0 +1,65 @@
+/* Dropcaps */
+.trx_addons_dropcap {
+    margin: 0.25em 0 0 0.5em;
+}
+
+/* Lists */
+
+ul[class*="trx_addons_list"] {
+    padding-right:1.2em;
+    padding-left: 0;
+}
+
+ul[class*="trx_addons_list"] > li:before {
+    right: -1em;
+    left: auto;
+}
+
+ul.trx_addons_list_success,
+ul.trx_addons_list_error,
+ul.trx_addons_list_plus,
+ul.trx_addons_list_minus {
+    padding-right: 1.5em;
+    padding-left: 0;
+}
+
+ul.trx_addons_list_success > li:before,
+ul.trx_addons_list_error > li:before,
+ul.trx_addons_list_plus > li:before,
+ul.trx_addons_list_minus > li:before {
+    right: -1.3em;
+    left: auto;
+}
+
+ul[class*="trx_addons_list_dot"] > li:before {
+    right: -0.8em;
+    left: auto;
+}
+
+ul[class*="trx_addons_list_custom"] > li:before {
+    right: -0.8em;
+    left: auto;
+}
+
+ul[class*="trx_addons_list"][class*="_circled"] {
+    padding-right: 1.8em;
+    padding-left: 0;
+}
+
+ul[class*="trx_addons_list"][class*="_circled"] > li:before {
+    right: -2.4em;
+    left: auto;
+}
+
+ul.trx_addons_list_parameters {
+    padding-right:0 !important;
+    padding-left: 0;
+}
+
+.trx_addons_list_parameters > li > strong {
+    text-align:right;
+}
+
+.trx_addons_list_parameters > li > em {
+    text-align:right;
+}

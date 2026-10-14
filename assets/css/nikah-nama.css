@@ -1,0 +1,688 @@
+:root {
+  --nn-green: #1a7a4c;
+  --nn-green-dark: #0f4d2f;
+  --nn-green-mid: #1f8f59;
+  --nn-green-soft: #e6f6ed;
+  --nn-gold: #c9a227;
+  --nn-gold-soft: #f3e7b8;
+  --nn-border: #d5e6db;
+  --nn-input-border: #d8c9a4;
+  --nn-bg: #e8f2ec;
+  --nn-card: #ffffff;
+  --nn-ink: #143024;
+  --nn-muted: #5b7166;
+  --nn-shadow: 0 14px 40px rgba(15, 70, 42, 0.12);
+  --nn-radius: 20px;
+  --nn-font: "Lexend", "Segoe UI", sans-serif;
+  --nn-width: min(640px, calc(100% - 28px));
+}
+
+* { box-sizing: border-box; }
+
+body.nikah-page {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, #dfeee6 0%, var(--nn-bg) 38%, #f3f8f5 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Scope form styles — do not override site menu/footer theme */
+body.nikah-page .tool-main,
+body.nikah-page .nn-page {
+  font-family: var(--nn-font);
+  color: var(--nn-ink);
+}
+
+.nn-bg-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% -10%, rgba(26, 122, 76, 0.22), transparent 60%),
+    radial-gradient(circle at 85% 20%, rgba(201, 162, 39, 0.12), transparent 35%),
+    radial-gradient(circle at 10% 70%, rgba(26, 122, 76, 0.08), transparent 40%);
+}
+
+.nn-bg-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image:
+    linear-gradient(30deg, #145c39 1px, transparent 1px),
+    linear-gradient(120deg, #145c39 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.nn-page {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 18px 14px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nn-topbar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin: 8px 0 14px;
+  position: relative;
+}
+
+.nn-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+  width: 100%;
+}
+
+.nn-card-head .nn-card-badge { margin-bottom: 0; }
+
+.nn-back {
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.nn-brand-hero {
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+  padding: 18px 18px 16px;
+  margin: 0 auto;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 249, 244, 0.88) 100%);
+  border: 1px solid rgba(26, 122, 76, 0.14);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(15, 70, 42, 0.08);
+  animation: nnRise 0.45s ease both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nn-hero-logo {
+  width: clamp(120px, 24vw, 156px);
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 8px 16px rgba(15, 70, 42, 0.14));
+}
+
+.nn-bismillah {
+  font-family: "Traditional Arabic", "Noto Naskh Arabic", "Segoe UI", serif;
+  font-size: clamp(1.2rem, 2.8vw, 1.45rem);
+  color: var(--nn-green-dark);
+  line-height: 1.2;
+  margin: 6px 0 0;
+}
+
+.nn-brand-divider {
+  width: 72px;
+  height: 3px;
+  margin: 10px auto 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--nn-gold), var(--nn-green), var(--nn-gold), transparent);
+}
+
+.nn-brand-hero h1 {
+  margin: 0;
+  font-size: clamp(1.35rem, 3.2vw, 1.7rem);
+  font-weight: 800;
+  color: var(--nn-green-dark);
+  letter-spacing: -0.02em;
+  display: block;
+  line-height: 1.25;
+  max-width: 18ch;
+}
+
+.nn-brand-meta {
+  margin: 8px 0 0;
+  color: var(--nn-muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1.4;
+}
+
+.nn-brand-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nn-brand-meta i {
+  color: var(--nn-green);
+}
+
+.nn-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--nn-gold);
+  display: inline-block;
+}
+
+.nn-btn {
+  border: 0;
+  border-radius: 12px;
+  padding: 13px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.nn-btn-primary {
+  background: linear-gradient(180deg, var(--nn-green-mid) 0%, var(--nn-green) 100%);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(26, 122, 76, 0.28);
+}
+.nn-btn-primary:hover {
+  background: linear-gradient(180deg, #229a60 0%, var(--nn-green-dark) 100%);
+  transform: translateY(-2px);
+}
+
+.nn-btn-secondary {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--nn-green-dark);
+  border: 1px solid var(--nn-border);
+  backdrop-filter: blur(6px);
+}
+.nn-btn-secondary:hover {
+  border-color: var(--nn-green);
+  background: var(--nn-green-soft);
+}
+
+.nn-btn-gold {
+  background: linear-gradient(180deg, #f0d56a, var(--nn-gold));
+  color: #1a1a1a;
+}
+.nn-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.nikah-msg {
+  width: var(--nn-width);
+  margin: 10px auto 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  display: none;
+  font-size: 0.92rem;
+  text-align: center;
+}
+.nikah-msg.show { display: block; animation: nnRise 0.25s ease; }
+.nikah-msg.ok { background: var(--nn-green-soft); color: var(--nn-green-dark); border: 1px solid #b7e0c6; }
+.nikah-msg.err { background: #fdecea; color: #8a1f14; border: 1px solid #f5c2bc; }
+
+.contact-gate,
+.nikah-sheet {
+  width: var(--nn-width);
+  margin: 14px auto 0;
+  background: var(--nn-card);
+  border: 1px solid rgba(26, 122, 76, 0.12);
+  border-radius: var(--nn-radius);
+  box-shadow: var(--nn-shadow);
+  position: relative;
+  overflow: hidden;
+  animation: nnRise 0.4s ease both;
+}
+
+.contact-gate::before,
+.nikah-sheet::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--nn-green-dark), var(--nn-green), var(--nn-gold), var(--nn-green));
+}
+
+.contact-gate {
+  padding: 26px 24px 22px;
+}
+
+.nn-card-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--nn-green);
+  background: var(--nn-green-soft);
+  border: 1px solid #c5e8d3;
+  padding: 5px 10px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.contact-gate h2,
+.form-card-title,
+.party-head,
+.section-label {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--nn-green-dark);
+  letter-spacing: -0.01em;
+}
+
+.contact-gate .hint,
+.form-card-hint,
+.form-step-intro {
+  margin: 0 0 18px;
+  color: var(--nn-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.nikah-inner {
+  position: relative;
+  z-index: 1;
+  padding: 22px 22px 10px;
+}
+
+.nikah-header {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 14px;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(230, 246, 237, 0.95), rgba(255, 255, 255, 0.9)),
+    radial-gradient(circle at 90% 20%, rgba(201, 162, 39, 0.15), transparent 40%);
+  border: 1px solid var(--nn-border);
+}
+
+.nikah-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+.nikah-logo img {
+  width: 58px;
+  height: auto;
+  display: block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 10px rgba(15, 70, 42, 0.15));
+}
+.nikah-logo .brand-name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--nn-green-dark);
+}
+.nikah-logo .charity {
+  margin-top: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--nn-muted);
+  letter-spacing: 0.04em;
+}
+
+.nikah-title-block { display: none; }
+
+.nikah-cert-meta { width: 100%; }
+.nikah-cert-meta .under-law { display: none; }
+.nikah-cert-no label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--nn-green-dark);
+  margin-bottom: 5px;
+}
+.nikah-cert-no input,
+.nikah-cert-no .value {
+  width: 100%;
+  border: 1px solid var(--nn-input-border);
+  background: #fffef8;
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 10px 12px;
+  font-weight: 600;
+  color: var(--nn-muted);
+}
+
+.party-grid,
+.party-grid.single {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin: 0;
+  max-width: none;
+}
+
+.party-card,
+.section-box {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  margin-bottom: 0;
+}
+
+.party-head,
+.section-label {
+  display: block;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  letter-spacing: -0.01em;
+}
+
+.nn-field { margin-bottom: 14px; }
+.nn-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--nn-green-dark);
+  margin-bottom: 6px;
+}
+.nn-field input,
+.nn-field textarea,
+.nn-field .value {
+  width: 100%;
+  border: 1px solid var(--nn-input-border);
+  background: #fff;
+  border-radius: 10px;
+  min-height: 46px;
+  padding: 11px 13px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--nn-ink);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nn-field input:focus,
+.nn-field textarea:focus {
+  outline: none;
+  border-color: var(--nn-green);
+  box-shadow: 0 0 0 4px rgba(26, 122, 76, 0.12);
+}
+.nn-field textarea { min-height: 92px; resize: vertical; }
+.nn-field input::placeholder,
+.nn-field textarea::placeholder { color: #9aada3; }
+
+.nn-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.dob-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.35fr;
+  gap: 8px;
+}
+.dob-row input { text-align: center; }
+.dob-hint {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.35fr;
+  gap: 8px;
+  font-size: 0.7rem;
+  color: var(--nn-muted);
+  text-align: center;
+  margin-top: 4px;
+}
+
+.marriage-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.dowry-box {
+  border: 1px solid var(--nn-border);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: left;
+  background: linear-gradient(180deg, #f7fcf9, #eef7f1);
+  margin-bottom: 14px;
+}
+.dowry-box .pound {
+  font-size: 1.4rem;
+  color: var(--nn-green);
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.dowry-pay {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.dowry-pay-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.dowry-pay-row span {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--nn-green-dark);
+}
+.money-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--nn-input-border);
+  background: #fff;
+  border-radius: 10px;
+  padding: 0 12px;
+  min-height: 46px;
+}
+.money-input b { color: var(--nn-green); }
+.money-input input {
+  border: 0;
+  background: transparent;
+  min-height: 42px;
+  width: 100%;
+  font: inherit;
+  outline: none;
+}
+
+.proposer-line {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.sig-row { display: none; }
+
+.witness-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 18px 0 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--nn-border);
+}
+
+.certify-block {
+  margin: 16px 0 8px;
+  padding: 16px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #f7fcf9, #eef7f1);
+  border: 1px solid var(--nn-border);
+  font-size: 0.9rem;
+  color: var(--nn-muted);
+  line-height: 1.5;
+}
+.certify-block input[name="certifierName"] {
+  display: block;
+  width: 100%;
+  min-width: 0 !important;
+  border: 1px solid var(--nn-input-border) !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  padding: 11px 13px !important;
+  font: inherit !important;
+  color: var(--nn-ink);
+  min-height: 46px;
+}
+.certify-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.certify-meta .sig-line { display: none; }
+
+.nikah-footer {
+  background: transparent;
+  color: var(--nn-muted);
+  margin: 18px 0 0;
+  padding: 14px 0 8px;
+  border-top: 1px solid var(--nn-border);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.nikah-note {
+  width: var(--nn-width);
+  margin: 14px auto 0;
+  color: var(--nn-muted);
+  font-size: 0.85rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.step-bar {
+  width: var(--nn-width);
+  margin: 14px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.step-pill {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--nn-border);
+  border-radius: 999px;
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--nn-muted);
+  box-shadow: 0 4px 12px rgba(15, 70, 42, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.step-pill span {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.72rem;
+  background: #e8efe9;
+  color: var(--nn-green-dark);
+}
+.step-pill.active {
+  background: linear-gradient(180deg, var(--nn-green-mid), var(--nn-green));
+  border-color: var(--nn-green);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(26, 122, 76, 0.25);
+}
+.step-pill.active span {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+.step-pill.done {
+  background: var(--nn-green-soft);
+  border-color: #b7e0c6;
+  color: var(--nn-green-dark);
+}
+.step-pill.done span {
+  background: var(--nn-green);
+  color: #fff;
+}
+
+.form-step { display: none; }
+.form-step.active { display: block; animation: nnRise 0.3s ease; }
+
+@keyframes nnRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.step-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: stretch;
+  margin: 6px 0 8px;
+}
+.step-nav .nn-btn { flex: 1 1 auto; min-width: 120px; }
+.step-nav .nn-btn-primary { flex: 1.5 1 auto; }
+
+.form-locked { display: none !important; }
+
+@media (max-width: 640px) {
+  .nn-page { padding: 12px 10px 36px; }
+  .contact-gate,
+  .nikah-inner { padding-left: 16px; padding-right: 16px; }
+  .contact-gate { padding-top: 20px; padding-bottom: 18px; }
+  .nn-row-2,
+  .dowry-pay-row,
+  .witness-grid {
+    grid-template-columns: 1fr;
+  }
+  .step-pill { font-size: 0.74rem; padding: 9px 4px; gap: 4px; }
+  .step-pill span { width: 20px; height: 20px; }
+  .nn-card-head { flex-wrap: wrap; }
+  .nn-brand-hero { padding: 14px 14px 12px; }
+  .nn-hero-logo { width: 118px; }
+}
+
+@media (min-width: 768px) {
+  .nn-page { padding-top: 18px; }
+  .nn-hero-logo { width: 156px; }
+}
+
+@media print {
+  body.nikah-page { background: #fff; }
+  .nn-bg-glow,
+  .nn-topbar,
+  .nikah-msg,
+  .nikah-note,
+  .no-print,
+  .step-bar { display: none !important; }
+  .nikah-sheet {
+    width: 100%;
+    margin: 0;
+    box-shadow: none;
+    border: 0;
+  }
+}

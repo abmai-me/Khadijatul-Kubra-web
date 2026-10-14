@@ -1,0 +1,8 @@
+.env
+node_modules/
+data/sms-outbox.json
+data/email-outbox.json
+data/avatars/
+error_log
+tmp-nikah/
+*.log
