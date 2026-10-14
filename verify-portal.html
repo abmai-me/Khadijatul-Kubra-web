@@ -7,32 +7,7 @@
   <link rel="shortcut icon" href="assets/images/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --g:#1a7a4c; --d:#145c39; --bg:#eef5f0; --border:#d5e4da; }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family:Lexend,sans-serif; background:var(--bg); color:#163025; }
-    .wrap { max-width:560px; margin:40px auto; padding:0 16px; }
-    .card { background:#fff; border-radius:16px; padding:28px; box-shadow:0 10px 30px rgba(20,60,40,.1); }
-    .logo { width:96px; display:block; margin:0 auto 12px; }
-    h1 { text-align:center; font-size:1.25rem; margin:0 0 6px; color:var(--d); }
-    .sub { text-align:center; color:#5c7266; margin:0 0 20px; font-size:.92rem; }
-    label { display:block; font-size:.8rem; font-weight:700; color:var(--d); margin-bottom:4px; }
-    .row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; }
-    input { width:100%; border:1px solid var(--border); border-radius:8px; padding:10px 12px; font:inherit; }
-    button, .btn {
-      border:0; border-radius:8px; padding:11px 16px; font-weight:700; cursor:pointer; font:inherit;
-      background:var(--g); color:#fff; text-decoration:none; display:inline-block;
-    }
-    .btn-secondary { background:#e8efe9; color:var(--d); }
-    .badge { display:inline-block; padding:6px 12px; border-radius:999px; font-weight:700; font-size:.85rem; margin-bottom:14px; }
-    .ok { background:#e5f6ec; color:#145c39; }
-    .wait { background:#fff6db; color:#8a6d00; }
-    .bad { background:#fdecea; color:#8a1f14; }
-    .err { color:#8a1f14; text-align:center; margin-top:12px; }
-    .result { margin-top:18px; display:none; text-align:center; }
-    .result.show { display:block; }
-    .line { display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid #e5efe9; font-size:.95rem; text-align:left; }
-    .line span { color:#5c7266; }
-    .actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:16px; }
+    /* scoped — avoid Bootstrap .card / .row / global h1 clashes */
   </style>
 <!-- Site chrome -->
 <link href="assets/css/bootstrap.css" rel="stylesheet">
@@ -200,26 +175,262 @@
 	
 	</header>
 <div class="tool-main">
-<div class="wrap">
-    <div class="card">
-      <img class="logo" src="assets/images/logo.png" alt="KKT">
-      <h1>Verification Portal</h1>
-      <p class="sub">Enter Certificate Number to verify an approved Nikah Nama</p>
-      <div class="row">
-        <div>
-          <label>Certificate No</label>
-          <input id="certNo" placeholder="NN-XXXXXXXX">
-        </div>
-        <button type="button" id="verifyBtn">Verify</button>
-      </div>
-      <p id="err" class="err" style="display:none"></p>
-      <div id="result" class="result"></div>
-      <div class="actions">
-        <a class="btn btn-secondary" href="track-nikah.html">Track Application</a>
-        <a class="btn btn-secondary" href="forms.html">Forms</a>
-      </div>
-    </div>
-  </div>
+	<section class="page-title" style="background-image:url(assets/images/background/page-title.jpg)">
+		<div class="auto-container">
+			<h2>Verification Portal</h2>
+			<ul class="bread-crumb clearfix">
+				<li><a href="index.html">Home</a></li>
+				<li><a href="forms.html">Forms</a></li>
+				<li>Verify</li>
+			</ul>
+		</div>
+	</section>
+
+	<section class="vp-shell">
+		<div class="vp-wrap">
+			<div class="vp-card">
+				<div class="vp-brand">
+					<img src="assets/images/logo.png" alt="Khadijatul Kubra Trust">
+					<span class="vp-kicker">Nikah Nama</span>
+					<h2 class="vp-title">Verification Portal</h2>
+					<p class="vp-sub">Enter a certificate number to verify an approved Nikah Nama.</p>
+				</div>
+
+				<div class="vp-form">
+					<label class="vp-label" for="certNo">Certificate No</label>
+					<div class="vp-row">
+						<input id="certNo" class="vp-input" type="text" placeholder="NN-XXXXXXXX" autocomplete="off" spellcheck="false">
+						<button type="button" class="vp-btn" id="verifyBtn">Verify</button>
+					</div>
+					<p id="err" class="vp-err" hidden></p>
+				</div>
+
+				<div id="result" class="vp-result" hidden></div>
+
+				<div class="vp-actions">
+					<a class="vp-link-btn" href="track-nikah.html"><i class="fa-solid fa-magnifying-glass"></i> Track Application</a>
+					<a class="vp-link-btn" href="forms.html"><i class="fa-solid fa-file-lines"></i> Forms</a>
+					<a class="vp-link-btn vp-link-btn--soft" href="nikah-nama.html"><i class="fa-solid fa-ring"></i> Apply</a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<style>
+		#cms-live-body:empty { display: none !important; }
+		body.tool-page { background: #eef5f1 !important; }
+		body.tool-page .page-wrapper { overflow: visible; }
+		.vp-shell {
+			--vp-g: #1a7a4c;
+			--vp-d: #145c39;
+			--vp-line: #d5e4da;
+			padding: 28px 16px 56px;
+			background:
+				radial-gradient(ellipse 70% 40% at 50% 0%, rgba(243,184,21,0.12), transparent 55%),
+				linear-gradient(180deg, #eef7f1 0%, #f7fbf8 100%);
+		}
+		.vp-wrap {
+			width: min(640px, 100%);
+			margin: 0 auto;
+		}
+		.vp-card {
+			background: #fff;
+			border: 1px solid var(--vp-line);
+			border-radius: 20px;
+			padding: 28px 26px 24px;
+			box-shadow: 0 16px 36px rgba(20, 92, 57, 0.1);
+			position: relative;
+			overflow: hidden;
+		}
+		.vp-card::before {
+			content: "";
+			position: absolute;
+			left: 0; top: 0; right: 0;
+			height: 4px;
+			background: linear-gradient(90deg, #145c39, #1a7a4c, #c9a227);
+		}
+		.vp-brand {
+			text-align: center;
+			margin-bottom: 22px;
+		}
+		.vp-brand img {
+			width: 88px;
+			height: auto;
+			display: block;
+			margin: 0 auto 12px;
+		}
+		.vp-kicker {
+			display: inline-block;
+			font-size: 0.72rem;
+			font-weight: 800;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: var(--vp-g);
+			background: #e5f6ec;
+			border: 1px solid #c5e8d3;
+			padding: 5px 12px;
+			border-radius: 999px;
+			margin-bottom: 10px;
+		}
+		.vp-shell .vp-title {
+			margin: 0 0 8px !important;
+			padding: 0 !important;
+			font-size: clamp(1.45rem, 3vw, 1.85rem) !important;
+			font-weight: 800 !important;
+			line-height: 1.3 !important;
+			color: var(--vp-d) !important;
+			text-transform: none !important;
+			letter-spacing: normal !important;
+			background: none !important;
+			-webkit-text-fill-color: var(--vp-d) !important;
+			text-shadow: none !important;
+			position: static !important;
+			overflow: visible !important;
+			white-space: normal !important;
+			word-break: keep-all !important;
+			max-width: none !important;
+			width: auto !important;
+			display: block !important;
+		}
+		.vp-shell .vp-title::before,
+		.vp-shell .vp-title::after { display: none !important; content: none !important; }
+		.vp-sub {
+			margin: 0 auto;
+			max-width: 28em;
+			color: #5c7266;
+			font-size: 0.95rem;
+			line-height: 1.5;
+		}
+		.vp-label {
+			display: block;
+			font-size: 0.8rem;
+			font-weight: 700;
+			color: var(--vp-d);
+			margin-bottom: 6px;
+		}
+		.vp-row {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			gap: 10px;
+			align-items: stretch;
+		}
+		.vp-input {
+			width: 100%;
+			border: 1px solid var(--vp-line);
+			border-radius: 12px;
+			padding: 12px 14px;
+			font: inherit;
+			font-size: 1rem;
+			color: #163025;
+			background: #fff;
+			transition: border-color .15s ease, box-shadow .15s ease;
+		}
+		.vp-input:focus {
+			outline: none;
+			border-color: var(--vp-g);
+			box-shadow: 0 0 0 3px rgba(26, 122, 76, 0.15);
+		}
+		.vp-btn {
+			border: 0;
+			border-radius: 12px;
+			padding: 12px 22px;
+			font: inherit;
+			font-weight: 800;
+			cursor: pointer;
+			background: linear-gradient(135deg, #145c39, #1a7a4c);
+			color: #fff;
+			white-space: nowrap;
+			box-shadow: 0 8px 18px rgba(26, 122, 76, 0.25);
+			transition: transform .15s ease;
+		}
+		.vp-btn:hover { transform: translateY(-1px); }
+		.vp-err {
+			margin: 10px 0 0;
+			color: #8a1f14;
+			font-size: 0.9rem;
+			text-align: center;
+		}
+		.vp-err[hidden] { display: none !important; }
+		.vp-result {
+			margin-top: 18px;
+			padding: 16px 14px;
+			border-radius: 14px;
+			background: #f7fbf8;
+			border: 1px solid #d7e8de;
+			text-align: center;
+		}
+		.vp-result[hidden] { display: none !important; }
+		.vp-badge {
+			display: inline-block;
+			padding: 6px 14px;
+			border-radius: 999px;
+			font-weight: 800;
+			font-size: 0.82rem;
+			letter-spacing: 0.03em;
+			margin-bottom: 12px;
+		}
+		.vp-badge--ok { background: #e5f6ec; color: #145c39; }
+		.vp-badge--wait { background: #fff6db; color: #8a6d00; }
+		.vp-badge--bad { background: #fdecea; color: #8a1f14; }
+		.vp-line {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			padding: 10px 4px;
+			border-bottom: 1px solid #e5efe9;
+			font-size: 0.94rem;
+			text-align: left;
+		}
+		.vp-line:last-of-type { border-bottom: 0; }
+		.vp-line span { color: #5c7266; }
+		.vp-line strong { color: #145c39; font-weight: 700; }
+		.vp-msg {
+			margin: 12px 0 0;
+			color: #5c7266;
+			font-size: 0.9rem;
+			line-height: 1.5;
+		}
+		.vp-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			justify-content: center;
+			margin-top: 20px;
+			padding-top: 18px;
+			border-top: 1px dashed #d7e8de;
+		}
+		.vp-link-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 7px;
+			padding: 10px 14px;
+			border-radius: 999px;
+			border: 1.5px solid var(--vp-line);
+			background: #fff;
+			color: var(--vp-d);
+			font-size: 0.86rem;
+			font-weight: 700;
+			text-decoration: none;
+			transition: background .15s ease, border-color .15s ease;
+		}
+		.vp-link-btn i { color: var(--vp-g); }
+		.vp-link-btn:hover {
+			background: #eef7f1;
+			border-color: #b7d8c4;
+			color: var(--vp-d);
+		}
+		.vp-link-btn--soft {
+			background: #e5f6ec;
+			border-color: #c5e8d3;
+		}
+		@media (max-width: 575px) {
+			.vp-card { padding: 22px 16px 18px; border-radius: 16px; }
+			.vp-row { grid-template-columns: 1fr; }
+			.vp-btn { width: 100%; }
+			.vp-actions { flex-direction: column; }
+			.vp-link-btn { justify-content: center; }
+		}
+	</style>
 </div>
 	<footer class="main-footer">
 		<div class="footer_bg-image" style="background-image: url(assets/images/background/footer-bg.jpg)"></div>
@@ -348,12 +559,12 @@
     }
 
     async function verify() {
-      err.style.display = "none";
-      result.classList.remove("show");
+      err.hidden = true;
+      result.hidden = true;
       const c = certNo.value.trim();
       if (!c) {
         err.textContent = "Enter Certificate No.";
-        err.style.display = "block";
+        err.hidden = false;
         return;
       }
       try {
@@ -362,28 +573,28 @@
         if (!res.ok) throw new Error(data.error || "Not found");
         if (data.verified) {
           result.innerHTML = `
-            <span class="badge ok">VERIFIED · APPROVED</span>
-            <div class="line"><span>Certificate No</span><strong>${esc(data.certificateNo)}</strong></div>
-            <div class="line"><span>Groom</span><strong>${esc(data.groomName)}</strong></div>
-            <div class="line"><span>Bride</span><strong>${esc(data.brideName)}</strong></div>
-            <div class="line"><span>Marriage Date</span><strong>${esc(data.marriageDate)}</strong></div>
-            <div class="line"><span>Place</span><strong>${esc(data.placeOfMarriage)}</strong></div>
-            <p class="sub" style="margin-top:14px;margin-bottom:0">${esc(data.message)}</p>
+            <span class="vp-badge vp-badge--ok">VERIFIED · APPROVED</span>
+            <div class="vp-line"><span>Certificate No</span><strong>${esc(data.certificateNo)}</strong></div>
+            <div class="vp-line"><span>Groom</span><strong>${esc(data.groomName)}</strong></div>
+            <div class="vp-line"><span>Bride</span><strong>${esc(data.brideName)}</strong></div>
+            <div class="vp-line"><span>Marriage Date</span><strong>${esc(data.marriageDate)}</strong></div>
+            <div class="vp-line"><span>Place</span><strong>${esc(data.placeOfMarriage)}</strong></div>
+            <p class="vp-msg">${esc(data.message)}</p>
           `;
         } else {
-          const badge = data.status === "rejected" ? "bad" : "wait";
+          const badge = data.status === "rejected" ? "vp-badge--bad" : "vp-badge--wait";
           const label = data.status === "pending" ? "WAITING" : String(data.status || "NOT APPROVED").toUpperCase();
           result.innerHTML = `
-            <span class="badge ${badge}">${esc(label)}</span>
-            <div class="line"><span>Certificate No</span><strong>${esc(data.certificateNo)}</strong></div>
-            <p class="sub" style="margin-top:14px;margin-bottom:0">${esc(data.message || "Not verified")}</p>
+            <span class="vp-badge ${badge}">${esc(label)}</span>
+            <div class="vp-line"><span>Certificate No</span><strong>${esc(data.certificateNo)}</strong></div>
+            <p class="vp-msg">${esc(data.message || "Not verified")}</p>
           `;
         }
-        result.classList.add("show");
+        result.hidden = false;
         history.replaceState(null, "", `?c=${encodeURIComponent(c)}`);
       } catch (e) {
         err.textContent = e.message || "Verification failed";
-        err.style.display = "block";
+        err.hidden = false;
       }
     }
 

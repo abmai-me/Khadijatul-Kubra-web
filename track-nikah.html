@@ -7,42 +7,7 @@
   <link rel="shortcut icon" href="assets/images/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --g:#1a7a4c; --d:#145c39; --bg:#eef5f0; --border:#d5e4da; }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family:Lexend,sans-serif; background:var(--bg); color:#163025; }
-    .wrap { max-width:560px; margin:28px auto 48px; padding:0 16px; }
-    .card { background:#fff; border-radius:16px; padding:22px; box-shadow:0 10px 30px rgba(20,60,40,.1); margin-bottom:14px; }
-    .logo { width:88px; display:block; margin:0 auto 10px; }
-    h1 { text-align:center; font-size:1.3rem; margin:0 0 6px; color:var(--d); }
-    .sub { text-align:center; color:#5c7266; margin:0 0 18px; font-size:.92rem; }
-    .track-form { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; }
-    label { display:block; font-size:.8rem; font-weight:700; color:var(--d); margin-bottom:4px; }
-    input { width:100%; border:1px solid var(--border); border-radius:8px; padding:10px 12px; font:inherit; }
-    button, .btn {
-      border:0; border-radius:8px; padding:11px 16px; font-weight:700; cursor:pointer; font:inherit;
-      background:var(--g); color:#fff; text-decoration:none; display:inline-block;
-    }
-    .btn-secondary { background:#e8efe9; color:var(--d); }
-    .badge { display:inline-block; padding:8px 14px; border-radius:999px; font-weight:700; font-size:.9rem; }
-    .ok { background:#e5f6ec; color:#145c39; }
-    .wait { background:#fff6db; color:#8a6d00; }
-    .bad { background:#fdecea; color:#8a1f14; }
-    .err { color:#8a1f14; text-align:center; }
-    .status-box { text-align:center; padding:8px 0 4px; }
-    .status-box p { color:#5c7266; font-size:.9rem; margin:10px 0 0; }
-    .pin-box {
-      margin-top:18px; padding:16px; border:1px solid var(--border); border-radius:12px; background:#f8fbf9;
-    }
-    .pin-box h3 { margin:0 0 8px; font-size:1rem; color:var(--d); }
-    .pin-box p { margin:0 0 12px; color:#5c7266; font-size:.88rem; }
-    .pin-row { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; }
-    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; justify-content:center; }
-    .links { text-align:center; margin-top:14px; font-size:.9rem; }
-    .links a { color:var(--g); font-weight:600; }
-    .meta { text-align:center; color:#7a8f84; font-size:.8rem; margin-top:10px; }
-    @media (max-width:560px) {
-      .track-form, .pin-row { grid-template-columns:1fr; }
-    }
+    /* scoped track styles live in page body */
   </style>
 <!-- Site chrome -->
 <link href="assets/css/bootstrap.css" rel="stylesheet">
@@ -210,23 +175,274 @@
 	
 	</header>
 <div class="tool-main">
-<div class="wrap">
-    <div class="card">
-      <img class="logo" src="assets/images/logo.png" alt="KKT">
-      <h1>Track Nikah Nama Application</h1>
-      <p class="sub">Enter your Certificate Number to check status only</p>
-      <div class="track-form">
-        <div>
-          <label>Certificate No</label>
-          <input id="certNo" placeholder="NN-XXXXXXXX">
-        </div>
-        <button type="button" id="trackBtn">Track</button>
-      </div>
-      <p id="err" class="err" style="display:none;margin-top:12px"></p>
-      <p class="links">Looking to verify an approved certificate? <a href="verify-portal.html">Open Verification Portal</a></p>
-    </div>
-    <div id="result" class="card" hidden></div>
-  </div>
+	<section class="page-title" style="background-image:url(assets/images/background/page-title.jpg)">
+		<div class="auto-container">
+			<h2>Track Application</h2>
+			<ul class="bread-crumb clearfix">
+				<li><a href="index.html">Home</a></li>
+				<li><a href="forms.html">Forms</a></li>
+				<li>Track</li>
+			</ul>
+		</div>
+	</section>
+
+	<section class="tk-shell">
+		<div class="tk-wrap">
+			<div class="tk-card">
+				<div class="tk-brand">
+					<img src="assets/images/logo.png" alt="Khadijatul Kubra Trust">
+					<span class="tk-kicker">Nikah Nama</span>
+					<h2 class="tk-title">Track Application</h2>
+					<p class="tk-sub">Enter your certificate number to check status only. Personal details are not shown here.</p>
+				</div>
+
+				<div class="tk-form">
+					<label class="tk-label" for="certNo">Certificate No</label>
+					<div class="tk-row">
+						<input id="certNo" class="tk-input" type="text" placeholder="NN-XXXXXXXX" autocomplete="off" spellcheck="false">
+						<button type="button" class="tk-btn" id="trackBtn">Track</button>
+					</div>
+					<p id="err" class="tk-err" hidden></p>
+				</div>
+
+				<div id="result" class="tk-result" hidden></div>
+
+				<div class="tk-actions">
+					<a class="tk-link-btn" href="verify-portal.html"><i class="fa-solid fa-shield-halved"></i> Verify Portal</a>
+					<a class="tk-link-btn" href="forms.html"><i class="fa-solid fa-file-lines"></i> Forms</a>
+					<a class="tk-link-btn tk-link-btn--soft" href="nikah-nama.html"><i class="fa-solid fa-ring"></i> Apply</a>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<style>
+		#cms-live-body:empty { display: none !important; }
+		body.tool-page { background: #eef5f1 !important; }
+		body.tool-page .page-wrapper { overflow: visible; }
+		.tk-shell {
+			--tk-g: #1a7a4c;
+			--tk-d: #145c39;
+			--tk-line: #d5e4da;
+			padding: 28px 16px 56px;
+			background:
+				radial-gradient(ellipse 70% 40% at 50% 0%, rgba(243,184,21,0.12), transparent 55%),
+				linear-gradient(180deg, #eef7f1 0%, #f7fbf8 100%);
+		}
+		.tk-wrap {
+			width: min(640px, 100%);
+			margin: 0 auto;
+		}
+		.tk-card {
+			background: #fff;
+			border: 1px solid var(--tk-line);
+			border-radius: 20px;
+			padding: 28px 26px 24px;
+			box-shadow: 0 16px 36px rgba(20, 92, 57, 0.1);
+			position: relative;
+			overflow: hidden;
+		}
+		.tk-card::before {
+			content: "";
+			position: absolute;
+			left: 0; top: 0; right: 0;
+			height: 4px;
+			background: linear-gradient(90deg, #145c39, #1a7a4c, #c9a227);
+		}
+		.tk-brand { text-align: center; margin-bottom: 22px; }
+		.tk-brand img {
+			width: 88px;
+			height: auto;
+			display: block;
+			margin: 0 auto 12px;
+		}
+		.tk-kicker {
+			display: inline-block;
+			font-size: 0.72rem;
+			font-weight: 800;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: var(--tk-g);
+			background: #e5f6ec;
+			border: 1px solid #c5e8d3;
+			padding: 5px 12px;
+			border-radius: 999px;
+			margin-bottom: 10px;
+		}
+		.tk-shell .tk-title {
+			margin: 0 0 8px !important;
+			padding: 0 !important;
+			font-size: clamp(1.45rem, 3vw, 1.85rem) !important;
+			font-weight: 800 !important;
+			line-height: 1.3 !important;
+			color: var(--tk-d) !important;
+			text-transform: none !important;
+			letter-spacing: normal !important;
+			background: none !important;
+			-webkit-text-fill-color: var(--tk-d) !important;
+			text-shadow: none !important;
+			position: static !important;
+			display: block !important;
+		}
+		.tk-shell .tk-title::before,
+		.tk-shell .tk-title::after { display: none !important; content: none !important; }
+		.tk-sub {
+			margin: 0 auto;
+			max-width: 30em;
+			color: #5c7266;
+			font-size: 0.95rem;
+			line-height: 1.5;
+		}
+		.tk-label {
+			display: block;
+			font-size: 0.8rem;
+			font-weight: 700;
+			color: var(--tk-d);
+			margin-bottom: 6px;
+		}
+		.tk-row {
+			display: grid;
+			grid-template-columns: 1fr auto;
+			gap: 10px;
+			align-items: stretch;
+		}
+		.tk-input {
+			width: 100%;
+			border: 1px solid var(--tk-line);
+			border-radius: 12px;
+			padding: 12px 14px;
+			font: inherit;
+			font-size: 1rem;
+			color: #163025;
+			background: #fff;
+			transition: border-color .15s ease, box-shadow .15s ease;
+		}
+		.tk-input:focus {
+			outline: none;
+			border-color: var(--tk-g);
+			box-shadow: 0 0 0 3px rgba(26, 122, 76, 0.15);
+		}
+		.tk-btn {
+			border: 0;
+			border-radius: 12px;
+			padding: 12px 22px;
+			font: inherit;
+			font-weight: 800;
+			cursor: pointer;
+			background: linear-gradient(135deg, #145c39, #1a7a4c);
+			color: #fff;
+			white-space: nowrap;
+			box-shadow: 0 8px 18px rgba(26, 122, 76, 0.25);
+			transition: transform .15s ease;
+		}
+		.tk-btn:hover { transform: translateY(-1px); }
+		.tk-err {
+			margin: 10px 0 0;
+			color: #8a1f14;
+			font-size: 0.9rem;
+			text-align: center;
+		}
+		.tk-err[hidden] { display: none !important; }
+		.tk-result {
+			margin-top: 18px;
+			padding: 16px 14px;
+			border-radius: 14px;
+			background: #f7fbf8;
+			border: 1px solid #d7e8de;
+		}
+		.tk-result[hidden] { display: none !important; }
+		.tk-status { text-align: center; padding: 4px 0 2px; }
+		.tk-badge {
+			display: inline-block;
+			padding: 7px 14px;
+			border-radius: 999px;
+			font-weight: 800;
+			font-size: 0.86rem;
+		}
+		.tk-badge--ok { background: #e5f6ec; color: #145c39; }
+		.tk-badge--wait { background: #fff6db; color: #8a6d00; }
+		.tk-badge--bad { background: #fdecea; color: #8a1f14; }
+		.tk-hint {
+			margin: 12px 0 0;
+			color: #5c7266;
+			font-size: 0.9rem;
+			line-height: 1.5;
+		}
+		.tk-meta {
+			margin: 8px 0 0;
+			color: #7a8f84;
+			font-size: 0.82rem;
+		}
+		.tk-meta strong { color: #145c39; }
+		.tk-pin {
+			margin-top: 16px;
+			padding: 16px;
+			border: 1px solid var(--tk-line);
+			border-radius: 14px;
+			background: #fff;
+			text-align: left;
+		}
+		.tk-pin h3 {
+			margin: 0 0 6px !important;
+			font-size: 1rem !important;
+			line-height: 1.3 !important;
+			font-weight: 800 !important;
+			color: var(--tk-d) !important;
+		}
+		.tk-pin > p {
+			margin: 0 0 12px;
+			color: #5c7266;
+			font-size: 0.88rem;
+		}
+		.tk-result-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			justify-content: center;
+			margin-top: 14px;
+		}
+		.tk-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			justify-content: center;
+			margin-top: 20px;
+			padding-top: 18px;
+			border-top: 1px dashed #d7e8de;
+		}
+		.tk-link-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 7px;
+			padding: 10px 14px;
+			border-radius: 999px;
+			border: 1.5px solid var(--tk-line);
+			background: #fff;
+			color: var(--tk-d);
+			font-size: 0.86rem;
+			font-weight: 700;
+			text-decoration: none;
+			transition: background .15s ease, border-color .15s ease;
+		}
+		.tk-link-btn i { color: var(--tk-g); }
+		.tk-link-btn:hover {
+			background: #eef7f1;
+			border-color: #b7d8c4;
+			color: var(--tk-d);
+		}
+		.tk-link-btn--soft {
+			background: #e5f6ec;
+			border-color: #c5e8d3;
+		}
+		@media (max-width: 575px) {
+			.tk-card { padding: 22px 16px 18px; border-radius: 16px; }
+			.tk-row { grid-template-columns: 1fr; }
+			.tk-btn { width: 100%; }
+			.tk-actions,
+			.tk-result-actions { flex-direction: column; }
+			.tk-link-btn { justify-content: center; }
+		}
+	</style>
 </div>
 	<footer class="main-footer">
 		<div class="footer_bg-image" style="background-image: url(assets/images/background/footer-bg.jpg)"></div>
@@ -365,10 +581,10 @@
       const pinEl = document.getElementById("downloadPin");
       const pinErr = document.getElementById("pinErr");
       const pin = (pinEl?.value || "").trim();
-      pinErr.style.display = "none";
+      pinErr.hidden = true;
       if (!pin) {
         pinErr.textContent = "Enter the PIN sent by the mosque.";
-        pinErr.style.display = "block";
+        pinErr.hidden = false;
         return;
       }
       try {
@@ -392,17 +608,17 @@
         URL.revokeObjectURL(url);
       } catch (e) {
         pinErr.textContent = e.message || "Invalid PIN";
-        pinErr.style.display = "block";
+        pinErr.hidden = false;
       }
     }
 
     async function track() {
-      err.style.display = "none";
+      err.hidden = true;
       result.hidden = true;
       const c = certNo.value.trim();
       if (!c) {
         err.textContent = "Enter Certificate No.";
-        err.style.display = "block";
+        err.hidden = false;
         return;
       }
       try {
@@ -410,7 +626,7 @@
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Not found");
         const badge =
-          data.status === "approved" ? "ok" : data.status === "rejected" ? "bad" : "wait";
+          data.status === "approved" ? "tk-badge--ok" : data.status === "rejected" ? "tk-badge--bad" : "tk-badge--wait";
         const hint =
           data.status === "approved"
             ? "Your application is approved. Enter the PIN from the mosque SMS to download the PDF."
@@ -418,33 +634,30 @@
             ? "Your application is waiting for admin approval. Personal details are not shown here."
             : "This application was not approved. Contact the mosque for help.";
 
-        const pinBlock =
-          data.canDownload
-            ? `<div class="pin-box">
+        const pinBlock = data.canDownload
+          ? `<div class="tk-pin">
                 <h3>Download Nikah Nama PDF</h3>
                 <p>Use the PIN sent to your mobile after approval.</p>
-                <div class="pin-row">
-                  <div>
-                    <label>Download PIN</label>
-                    <input id="downloadPin" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit PIN">
-                  </div>
-                  <button type="button" id="downloadBtn">Download PDF</button>
+                <label class="tk-label" for="downloadPin">Download PIN</label>
+                <div class="tk-row">
+                  <input id="downloadPin" class="tk-input" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit PIN">
+                  <button type="button" class="tk-btn" id="downloadBtn">Download PDF</button>
                 </div>
-                <p id="pinErr" class="err" style="display:none;margin-top:10px"></p>
+                <p id="pinErr" class="tk-err" hidden></p>
               </div>`
-            : "";
+          : "";
 
         result.innerHTML = `
-          <div class="status-box">
-            <span class="badge ${badge}">${esc(statusLabel(data.status))}</span>
-            <p>${esc(hint)}</p>
-            <p class="meta">Certificate: <strong>${esc(data.certificateNo)}</strong></p>
+          <div class="tk-status">
+            <span class="tk-badge ${badge}">${esc(statusLabel(data.status))}</span>
+            <p class="tk-hint">${esc(hint)}</p>
+            <p class="tk-meta">Certificate: <strong>${esc(data.certificateNo)}</strong></p>
           </div>
           ${pinBlock}
-          <div class="actions">
-            <a class="btn btn-secondary" href="/verify-portal.html?c=${encodeURIComponent(data.certificateNo)}">Verify Portal</a>
-            <a class="btn btn-secondary" href="/nikah-nama.html">New Application</a>
-            <a class="btn btn-secondary" href="/forms.html">Forms</a>
+          <div class="tk-result-actions">
+            <a class="tk-link-btn" href="verify-portal.html?c=${encodeURIComponent(data.certificateNo)}"><i class="fa-solid fa-shield-halved"></i> Verify</a>
+            <a class="tk-link-btn" href="nikah-nama.html"><i class="fa-solid fa-ring"></i> New Application</a>
+            <a class="tk-link-btn tk-link-btn--soft" href="forms.html"><i class="fa-solid fa-file-lines"></i> Forms</a>
           </div>
         `;
         result.hidden = false;
@@ -458,7 +671,7 @@
         }
       } catch (e) {
         err.textContent = e.message || "Could not track application";
-        err.style.display = "block";
+        err.hidden = false;
       }
     }
 
