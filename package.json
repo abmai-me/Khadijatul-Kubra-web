@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "deploy": "powershell -ExecutionPolicy Bypass -File ./deploy.ps1"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",

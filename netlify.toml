@@ -1,0 +1,13 @@
+[build]
+  publish = "."
+  command = "echo 'Static site — no build step'"
+
+[[redirects]]
+  from = "/portal"
+  to = "/portal/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
