@@ -11,13 +11,28 @@ const { fillNikahPdf } = require("./lib/nikah-pdf");
 const app = express();
 const PORT = process.env.PORT || 4000;
 const ROOT = __dirname;
-const DATA_FILE = path.join(ROOT, "data", "store.json");
-const CMS_FILE = path.join(ROOT, "data", "cms.json");
-const SMS_OUTBOX_FILE = path.join(ROOT, "data", "sms-outbox.json");
-const EMAIL_OUTBOX_FILE = path.join(ROOT, "data", "email-outbox.json");
-const AVATAR_DIR = path.join(ROOT, "data", "avatars");
+const DATA_DIR = process.env.DATA_DIR
+  ? path.resolve(process.env.DATA_DIR)
+  : path.join(ROOT, "data");
+const DATA_FILE = path.join(DATA_DIR, "store.json");
+const CMS_FILE = path.join(DATA_DIR, "cms.json");
+const SMS_OUTBOX_FILE = path.join(DATA_DIR, "sms-outbox.json");
+const EMAIL_OUTBOX_FILE = path.join(DATA_DIR, "email-outbox.json");
+const AVATAR_DIR = path.join(DATA_DIR, "avatars");
 
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(AVATAR_DIR)) fs.mkdirSync(AVATAR_DIR, { recursive: true });
+
+// Seed JSON data from repo defaults when the data disk/volume is empty.
+for (const [target, seedName] of [
+  [DATA_FILE, "store.json"],
+  [CMS_FILE, "cms.json"],
+]) {
+  if (!fs.existsSync(target)) {
+    const seed = path.join(ROOT, "data", seedName);
+    if (fs.existsSync(seed)) fs.copyFileSync(seed, target);
+  }
+}
 
 function loadEnvFile() {
   let text;
@@ -357,15 +372,20 @@ function writeCms(data) {
   fs.writeFileSync(CMS_FILE, JSON.stringify(data, null, 2));
 }
 
+app.set("trust proxy", 1);
 app.use(express.json({ limit: "6mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   session({
-    secret: "kkt-portal-secret-change-me",
+    secret: process.env.SESSION_SECRET || "kkt-portal-secret-change-me",
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 8 },
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 8,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    },
   })
 );
 

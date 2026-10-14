@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: khadijatul-kubra-web
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: BULKSMS_TOKEN_ID
+        sync: false
+      - key: BULKSMS_TOKEN_SECRET
+        sync: false
+      - key: BULKSMS_SENDER_ID
+        sync: false

@@ -4,6 +4,9 @@
   "private": true,
   "description": "Khadijatul Kubra Trust – public site + admin CRM portal",
   "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
