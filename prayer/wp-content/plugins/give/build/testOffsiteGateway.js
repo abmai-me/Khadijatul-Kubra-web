@@ -1,1 +1,0 @@
-!function(){"use strict";var e=window.wp.element;const t={id:"test-offsite-gateway",Fields(){return(0,e.createElement)("span",null,t.settings.message)}};window.givewp.gateways.register(t)}();
