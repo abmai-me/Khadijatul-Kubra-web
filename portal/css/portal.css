@@ -1505,4 +1505,125 @@ th {
   .word-desk { grid-template-columns: 1fr; }
   .attr-pane { max-height: 240px; }
   .form-template-row { flex-direction: column; align-items: flex-start; }
+
+  .appbar {
+    padding-top: calc(12px + env(safe-area-inset-top));
+    gap: 10px;
+  }
+
+  .appbar-brand {
+    min-width: 0;
+  }
+
+  .appbar-brand span {
+    display: none;
+  }
+
+  .main {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .theme-field,
+  .menu-row input {
+    font-size: 16px;
+  }
+
+  .btn,
+  .settings-nav-btn,
+  .builder-tab {
+    min-height: 44px;
+  }
+
+  .panel-head .btn,
+  .topbar-actions .btn,
+  .marriage-actions .btn,
+  .actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .table-wrap table,
+  .user-table {
+    min-width: 0;
+  }
+
+  .table-wrap thead {
+    display: none;
+  }
+
+  .table-wrap tr {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    padding: 6px 10px;
+    background: #fff;
+  }
+
+  .table-wrap td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    border-bottom: 1px solid #eef3ef;
+    padding: 8px 0;
+    min-width: 0;
+  }
+
+  .table-wrap td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--color-five);
+    flex: 0 0 38%;
+  }
+
+  .table-wrap td.actions,
+  .table-wrap td.marriage-actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .table-wrap td.actions::before,
+  .table-wrap td.marriage-actions::before {
+    flex: 1 0 100%;
+  }
+
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal-card,
+  .pdf-preview-card {
+    width: 100%;
+    max-width: none;
+    max-height: 92dvh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .login-page {
+    padding: 16px;
+    align-items: start;
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+
+  .login-card {
+    padding: 24px 16px;
+  }
+
+  #formBuilderEditor.is-expanded {
+    inset: 0;
+  }
+
+  .profile-menu {
+    width: min(260px, calc(100vw - 24px));
+  }
+}
+
+@media (max-width: 520px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
 }

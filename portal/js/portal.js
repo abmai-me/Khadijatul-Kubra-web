@@ -28,9 +28,23 @@ async function api(url, options = {}) {
   return res.json();
 }
 
+function tagMobileLabels(tbody) {
+  const table = tbody?.closest("table");
+  if (!table) return;
+  const labels = [...table.querySelectorAll("thead th")].map((th) => th.textContent.trim() || "Action");
+  tbody.querySelectorAll("tr").forEach((row) => {
+    const cells = [...row.children];
+    if (cells.length < 2) return;
+    cells.forEach((cell, index) => {
+      if (!cell.dataset.label) cell.dataset.label = labels[index] || "";
+    });
+  });
+}
+
 function showView(name) {
   const allowed = name === "settings" ? can("users", "manage") : can(name, "view");
   if (!allowed) return;
+  document.body.classList.remove("nav-open");
   document.getElementById("noAccess")?.classList.add("hidden");
   document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
   document.querySelectorAll(".nav-link[data-view]").forEach((n) => n.classList.remove("active"));
@@ -92,6 +106,7 @@ async function loadStudents() {
         )
         .join("")
     : `<tr><td colspan="5" class="muted">No students yet</td></tr>`;
+  tagMobileLabels(document.getElementById("studentsTable"));
 }
 
 function resetStudentForm() {
@@ -136,6 +151,7 @@ async function loadDonations() {
         )
         .join("")
     : `<tr><td colspan="7" class="muted">No donations yet</td></tr>`;
+  tagMobileLabels(document.getElementById("donationsTable"));
 }
 
 window.deleteDonation = async function (id) {
@@ -169,6 +185,7 @@ async function loadCollections() {
         )
         .join("")
     : `<tr><td colspan="6" class="muted">No ledger entries yet</td></tr>`;
+  tagMobileLabels(document.getElementById("collectionsTable"));
 }
 
 window.deleteCollection = async function (id) {
