@@ -1150,17 +1150,19 @@ document.getElementById("certPrefixBtn").addEventListener("click", async () => {
   const prefix = nikahFormConfig.certificatePrefix || "KKT";
   const year = nikahFormConfig.certificateYear || String(new Date().getFullYear());
   const next = nikahFormConfig.certificateNext || 1;
+  const autoMiddle = String(Math.max(1, Number(next) || 1)).padStart(4, "0");
   document.getElementById("certificatePrefix").value = prefix;
   document.getElementById("certificateYear").value = year;
-  document.getElementById("certificateMiddle").value = String(Math.max(1, Number(next) || 1)).padStart(4, "0");
+  document.getElementById("certificateMiddle").value = nikahFormConfig.certificateCode || autoMiddle;
   const refresh = () => {
     document.getElementById("certificatePreview").value = certificatePreview(
       document.getElementById("certificatePrefix").value,
+      document.getElementById("certificateMiddle").value,
       next,
       document.getElementById("certificateYear").value
     );
   };
-  ["certificatePrefix", "certificateYear"].forEach((id) => {
+  ["certificatePrefix", "certificateMiddle", "certificateYear"].forEach((id) => {
     document.getElementById(id).oninput = refresh;
   });
   refresh();
@@ -1173,7 +1175,7 @@ document.getElementById("saveCertPrefixBtn").addEventListener("click", async () 
   const payload = {
     fields: nikahFormConfig.fields || [],
     certificatePrefix: document.getElementById("certificatePrefix").value.trim(),
-    certificateCode: "",
+    certificateCode: document.getElementById("certificateMiddle").value.trim(),
     certificateYear: document.getElementById("certificateYear").value.trim(),
   };
   nikahFormConfig = await api("/api/nikah-form", {
@@ -1358,8 +1360,13 @@ document.getElementById("marriageForm").addEventListener("submit", async (e) => 
   const body = collectMarriageBody();
   // New admin entries stay waiting unless Approve is clicked
   if (!id) body.status = "pending";
-  if (id) await api(`/api/marriages/${id}`, { method: "PUT", body: JSON.stringify(body) });
-  else await api("/api/marriages", { method: "POST", body: JSON.stringify(body) });
+  try {
+    if (id) await api(`/api/marriages/${id}`, { method: "PUT", body: JSON.stringify(body) });
+    else await api("/api/marriages", { method: "POST", body: JSON.stringify(body) });
+  } catch (err) {
+    alert(err.message || "Could not save");
+    return;
+  }
   resetMarriageForm();
   loadMarriages();
   loadDashboard();

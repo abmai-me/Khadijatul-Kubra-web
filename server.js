@@ -34,7 +34,6 @@ const {
   cleanCertificateNo,
   cleanCertificateYear,
   formatCertificateNo,
-  cleanCertificateNo,
 } = require("./lib/nikah-form");
 
 const app = express();
@@ -1264,14 +1263,16 @@ app.put("/api/nikah-form", requirePerm("marriage", "update"), (req, res) => {
     certificatePrefix: cleanCertificatePrefix(
       req.body?.certificatePrefix ?? store.nikahForm?.certificatePrefix
     ),
-    certificateCode: cleanCertificateCode(
-      req.body?.certificateCode ?? store.nikahForm?.certificateCode
-    ),
     certificateYear: cleanCertificateYear(
       req.body?.certificateYear ?? store.nikahForm?.certificateYear
     ),
     certificateNext: Math.max(1, Number(store.nikahForm?.certificateNext) || 1),
   };
+  const autoMiddle = String(store.nikahForm.certificateNext).padStart(4, "0");
+  const typedMiddle = cleanCertificateCode(
+    req.body?.certificateCode ?? store.nikahForm?.certificateCode
+  );
+  store.nikahForm.certificateCode = typedMiddle === autoMiddle ? "" : typedMiddle;
   writeStore(store);
   res.json(publicNikahForm(store.nikahForm));
 });
@@ -1718,8 +1719,10 @@ app.post("/api/marriages", requirePerm("marriage", "create"), (req, res) => {
     body.status = "pending";
     delete body.downloadPin;
   }
-  const marriage = buildMarriage(body, null, { allowStatus: true });
+  const marriage = buildMarriage(body, null, { allowStatus: true, allowCertificateEdit: true });
   if (!marriage.certificateNo) marriage.certificateNo = issueCertificateNo(store);
+  const duplicateNew = store.marriages.some((item) => item.certificateNo && item.certificateNo === marriage.certificateNo);
+  if (duplicateNew) return res.status(400).json({ error: "That certificate number is already used" });
   store.marriages.unshift(marriage);
   writeStore(store);
   res.json(marriage);
@@ -1747,7 +1750,7 @@ app.put("/api/marriages/:id", requireAny([["marriage", "update"], ["marriage", "
       downloadPin: body.downloadPin != null ? body.downloadPin : existing.downloadPin,
     };
   }
-  const saved = buildMarriage(body, existing, { allowStatus: true });
+  const saved = buildMarriage(body, existing, { allowStatus: true, allowCertificateEdit: true });
   if (body.extraFields && canDo(user, "marriage", "update")) {
     saved.extraFields = sanitizeExtraFields(
       body.extraFields,
