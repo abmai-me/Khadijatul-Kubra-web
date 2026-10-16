@@ -649,6 +649,39 @@ body.nikah-page .nn-page {
 
 .form-locked { display: none !important; }
 
+.sign-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.sign-card {
+  border: 1px solid var(--nn-border);
+  border-radius: 14px;
+  padding: 10px;
+  background: #fff;
+}
+.sign-card label { display: block; font-weight: 600; margin-bottom: 6px; }
+.sign-card canvas {
+  width: 100%;
+  height: 90px;
+  border: 1px dashed #b7cfc2;
+  border-radius: 10px;
+  background: #fff;
+  touch-action: none;
+  cursor: crosshair;
+}
+.sign-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.sign-actions button,
+.sign-actions .file-btn {
+  border: 1px solid var(--nn-border);
+  background: #f4faf6;
+  color: var(--nn-ink);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
 @media (max-width: 640px) {
   .nn-page { padding: 12px 10px 36px; }
   .contact-gate,
@@ -670,6 +703,79 @@ body.nikah-page .nn-page {
   .nn-page { padding-top: 18px; }
   .nn-hero-logo { width: 156px; }
 }
+
+.sign-page { padding-top: 28px; }
+.sign-sheet {
+  width: min(560px, 100%);
+  background: #fff;
+  border: 1px solid var(--nn-border);
+  border-radius: 24px;
+  box-shadow: var(--nn-shadow);
+  padding: 28px 22px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.sign-sheet::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 6px;
+  background: linear-gradient(90deg, var(--nn-green-dark), var(--nn-gold), var(--nn-green));
+}
+.sign-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.sign-brand img { width: 54px; height: 54px; object-fit: contain; }
+.sign-brand strong { display: block; color: var(--nn-green-dark); font-size: 0.95rem; }
+.sign-brand span { color: var(--nn-muted); font-size: 0.78rem; }
+.sign-sheet h1 {
+  margin: 0 0 6px;
+  font-size: 1.55rem;
+  color: var(--nn-green-dark);
+}
+.sign-intro { margin: 0 0 14px; color: var(--nn-muted); }
+.sign-role {
+  display: inline-flex;
+  margin: 0 0 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--nn-gold-soft);
+  color: #6d5410;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.sign-page select {
+  width: 100%;
+  border: 1px solid var(--nn-input-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font: inherit;
+  color: var(--nn-ink);
+  background: #fff;
+}
+.sign-pad {
+  border: 1.5px solid var(--nn-green);
+  border-radius: 16px;
+  padding: 8px;
+  background: linear-gradient(180deg, #f4faf6, #fff);
+}
+.sign-pad canvas {
+  width: 100%;
+  height: 170px;
+  display: block;
+  background: #fff;
+  border-radius: 10px;
+  touch-action: none;
+  cursor: crosshair;
+}
+.sign-hint { margin: 8px 0 0; color: var(--nn-muted); font-size: 0.82rem; }
+.sign-page .sign-actions { margin-top: 14px; }
+.sign-page .sign-actions .nn-btn,
+.sign-page .sign-actions .file-btn { flex: 1; }
+.sign-page .file-btn { cursor: pointer; }
 
 @media print {
   body.nikah-page { background: #fff; }

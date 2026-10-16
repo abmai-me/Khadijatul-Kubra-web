@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add your signature | Khadijatul Kubra Trust</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/nikah-nama.css">
+  <script src="assets/js/signature-clean.js"></script>
+</head>
+<body class="nikah-page">
+  <div class="nn-bg-glow"></div>
+  <main class="nn-page sign-page">
+    <section class="sign-sheet">
+      <div class="sign-brand">
+        <img src="assets/images/logo.png" alt="Khadijatul Kubra Trust">
+        <div>
+          <strong>Khadijatul Kubra Trust</strong>
+          <span>Nikah Nama signature</span>
+        </div>
+      </div>
+      <h1>Add your signature</h1>
+      <p id="intro" class="sign-intro">Loading…</p>
+      <div id="who" class="sign-role" hidden></div>
+      <div id="msg" class="nikah-msg"></div>
+      <div id="rolePicker" class="nn-field" hidden>
+        <label>Whose signature is this?</label>
+        <select id="roleSelect"></select>
+      </div>
+      <div id="padWrap" hidden>
+        <div class="sign-pad">
+          <canvas id="pad" width="900" height="320"></canvas>
+        </div>
+        <p class="sign-hint">Draw in the box, or upload a picture of the signature. It is added to the certificate after admin approval.</p>
+        <div class="sign-actions">
+          <button type="button" class="nn-btn nn-btn-secondary" id="clearBtn">Clear</button>
+          <label class="nn-btn nn-btn-secondary file-btn">Upload<input id="fileInput" type="file" accept="image/png,image/jpeg" hidden></label>
+          <button type="button" class="nn-btn nn-btn-primary" id="submitBtn">Submit signature</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const token = params.get("t") || "";
+    const intro = document.getElementById("intro");
+    const who = document.getElementById("who");
+    const msg = document.getElementById("msg");
+    const rolePicker = document.getElementById("rolePicker");
+    const roleSelect = document.getElementById("roleSelect");
+    const padWrap = document.getElementById("padWrap");
+    const canvas = document.getElementById("pad");
+    const ctx = canvas.getContext("2d");
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#143826";
+    let dirty = false;
+    let drawing = false;
+    let payload = null;
+
+    function show(text, ok) {
+      msg.textContent = text;
+      msg.className = "nikah-msg show " + (ok ? "ok" : "err");
+    }
+
+    function point(event) {
+      const rect = canvas.getBoundingClientRect();
+      const src = event.touches ? event.touches[0] : event;
+      return {
+        x: ((src.clientX - rect.left) / rect.width) * canvas.width,
+        y: ((src.clientY - rect.top) / rect.height) * canvas.height,
+      };
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      drawing = true;
+      dirty = true;
+      const p = point(event);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+    });
+    canvas.addEventListener("pointermove", (event) => {
+      if (!drawing) return;
+      event.preventDefault();
+      const p = point(event);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+    });
+    canvas.addEventListener("pointerup", () => { drawing = false; });
+    canvas.addEventListener("pointerleave", () => { drawing = false; });
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      dirty = false;
+    });
+    document.getElementById("fileInput").addEventListener("change", (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      placeCleanSignature(file, ctx, canvas)
+        .then((placed) => {
+          dirty = placed;
+          if (!placed) show("Could not find a signature in that picture.", false);
+        })
+        .catch(() => show("Could not read that signature.", false));
+    });
+
+    function selectedRole() {
+      return payload.shared ? roleSelect.value : payload.roles[0].role;
+    }
+
+    function showRole(label) {
+      who.hidden = !label;
+      who.textContent = label ? label + " signature" : "";
+    }
+
+    function render() {
+      intro.textContent =
+        `Certificate ${payload.certificateNo}` +
+        (payload.groomName ? ` · ${payload.groomName} & ${payload.brideName}` : "");
+      if (payload.shared) {
+        const open = payload.roles.filter((role) => !role.locked);
+        rolePicker.hidden = false;
+        roleSelect.innerHTML = open
+          .map((role) => `<option value="${role.role}">${role.label}</option>`)
+          .join("");
+        padWrap.hidden = open.length === 0;
+        showRole(open[0] ? open[0].label : "");
+        roleSelect.onchange = () => {
+          const picked = payload.roles.find((role) => role.role === roleSelect.value);
+          showRole(picked ? picked.label : "");
+        };
+        if (!open.length) show("Every signature on this link is already submitted.", false);
+      } else {
+        const role = payload.roles[0];
+        rolePicker.hidden = true;
+        showRole(role.label);
+        if (role.locked) {
+          padWrap.hidden = true;
+          show(`${role.label} signature is already submitted and cannot be changed.`, false);
+          return;
+        }
+        padWrap.hidden = false;
+      }
+    }
+
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      if (!dirty) {
+        show("Draw or upload a signature first.", false);
+        return;
+      }
+      const res = await fetch(`/api/public/sign/${encodeURIComponent(token)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: selectedRole(), image: canvas.toDataURL("image/png") }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        show(data.error || "Could not submit", false);
+        return;
+      }
+      show(data.message || "Submitted", true);
+      padWrap.hidden = true;
+      rolePicker.hidden = true;
+    });
+
+    fetch(`/api/public/sign/${encodeURIComponent(token)}`)
+      .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok) throw new Error(data.error || "Link not found");
+        payload = data;
+        render();
+      })
+      .catch((err) => {
+        intro.textContent = "";
+        show(err.message || "Link not found", false);
+      });
+  </script>
+</body>
+</html>

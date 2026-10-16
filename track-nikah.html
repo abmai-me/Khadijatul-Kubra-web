@@ -208,7 +208,7 @@
 				<div id="result" class="tk-result" hidden></div>
 
 				<div class="tk-actions">
-					<a class="tk-link-btn" href="verify-portal.html"><i class="fa-solid fa-shield-halved"></i> Verify Portal</a>
+					<a class="tk-link-btn" id="verifyLink" href="verify-portal.html"><i class="fa-solid fa-shield-halved"></i> Verify Portal</a>
 					<a class="tk-link-btn" href="forms.html"><i class="fa-solid fa-file-lines"></i> Forms</a>
 					<a class="tk-link-btn tk-link-btn--soft" href="nikah-nama.html"><i class="fa-solid fa-ring"></i> Apply</a>
 				</div>
@@ -654,12 +654,11 @@
             <p class="tk-meta">Certificate: <strong>${esc(data.certificateNo)}</strong></p>
           </div>
           ${pinBlock}
-          <div class="tk-result-actions">
-            <a class="tk-link-btn" href="verify-portal.html?c=${encodeURIComponent(data.certificateNo)}"><i class="fa-solid fa-shield-halved"></i> Verify</a>
-            <a class="tk-link-btn" href="nikah-nama.html"><i class="fa-solid fa-ring"></i> New Application</a>
-            <a class="tk-link-btn tk-link-btn--soft" href="forms.html"><i class="fa-solid fa-file-lines"></i> Forms</a>
-          </div>
         `;
+        const verifyLink = document.getElementById("verifyLink");
+        if (verifyLink && data.certificateNo) {
+          verifyLink.href = "verify-portal.html?c=" + encodeURIComponent(data.certificateNo);
+        }
         result.hidden = false;
         history.replaceState(null, "", `?c=${encodeURIComponent(c)}`);
         const downloadBtn = document.getElementById("downloadBtn");

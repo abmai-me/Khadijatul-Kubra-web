@@ -86,6 +86,7 @@ async function loadStudents() {
           <td class="actions">
             ${can("students", "update") ? `<button class="btn btn-secondary" onclick='editStudent(${JSON.stringify(s).replace(/'/g, "&#39;")})'>Edit</button>` : ""}
             ${can("students", "delete") ? `<button class="btn btn-danger" onclick="deleteStudent('${s.id}')">Delete</button>` : ""}
+            <button class="btn btn-gold btn-sm" type="button" onclick="downloadCategoryPdf('Student','${s.id}')">Form PDF</button>
           </td>
         </tr>`
         )
@@ -263,6 +264,25 @@ function marriageDateLabel(m) {
   return m.weddingDate || "-";
 }
 
+function appliedDateLabel(m) {
+  if (!m.createdAt) return "-";
+  const date = new Date(m.createdAt);
+  if (Number.isNaN(date.getTime())) return "-";
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${day}/${month}/${date.getFullYear()}`;
+}
+
+const SIGN_ROLE_LABELS = [
+  ["groom", "Bridegroom"],
+  ["bride", "Bride"],
+  ["witness1", "Witness 1"],
+  ["witness2", "Witness 2"],
+  ["certifier", "Certifier"],
+];
+
+let nikahFormConfig = null;
+
 function collectMarriageBody() {
   const body = {};
   MARRIAGE_FIELDS.forEach((k) => {
@@ -271,6 +291,10 @@ function collectMarriageBody() {
   });
   body.status = document.getElementById("marriageStatus").value;
   body.notes = document.getElementById("marriageNotes").value.trim();
+  body.extraFields = {};
+  document.querySelectorAll("#marriageExtraFields [data-extra]").forEach((el) => {
+    body.extraFields[el.dataset.extra] = el.value.trim();
+  });
   return body;
 }
 
@@ -371,6 +395,25 @@ function marriageSectionsHtml(m) {
       </div>
     </div>
     <div class="detail-section">
+      <h4>Signatures</h4>
+      <div class="detail-grid">
+        ${SIGN_ROLE_LABELS.map(([key, label]) => {
+          const slot = m.signatures?.[key];
+          const status = slot?.status || "none";
+          return detailItem(label, status);
+        }).join("")}
+      </div>
+    </div>
+    ${
+      m.extraFields && Object.keys(m.extraFields).length
+        ? `<div class="detail-section"><h4>Extra online fields</h4><div class="detail-grid">${Object.entries(
+            m.extraFields
+          )
+            .map(([key, value]) => detailItem(key, value))
+            .join("")}</div></div>`
+        : ""
+    }
+    <div class="detail-section">
       <h4>8. Admin Notes</h4>
       <div class="detail-grid">
         <div class="detail-item" style="grid-column:1/-1"><span>Notes</span><strong>${esc(m.notes || "—")}</strong></div>
@@ -420,6 +463,16 @@ function openApproveModal(id, existingPin) {
   document.getElementById("approveMarriageId").value = id || "";
   document.getElementById("approveDownloadPin").value = existingPin || randomDownloadPin();
   document.getElementById("marriageApproveModal").classList.remove("hidden");
+  api("/api/certifier-signs")
+    .then((signs) => {
+      const select = document.getElementById("approveCertifier");
+      select.innerHTML =
+        `<option value="">No certifier signature</option>` +
+        signs
+          .map((sign) => `<option value="${esc(sign.id)}">${esc(sign.name)}</option>`)
+          .join("");
+    })
+    .catch(() => {});
 }
 
 function openSmsModal(m) {
@@ -482,17 +535,17 @@ async function loadMarriages() {
           const payload = encodeURIComponent(JSON.stringify(m));
           const isApproved = m.status === "approved";
           const isPending = m.status === "pending";
-          const pdfUrl = `/api/marriages/${encodeURIComponent(m.id)}/pdf`;
           const statusLabel = isPending ? "waiting" : m.status;
           const pinHint = isApproved && m.downloadPin ? `PIN ${m.downloadPin}` : "";
           return `<tr>
-          <td>${esc(m.certificateNo)}${pinHint ? `<div class="muted" style="font-size:.75rem">${esc(pinHint)}</div>` : ""}</td>
-          <td>${esc(marriageDisplayName(m, "groom"))}</td>
-          <td>${esc(marriageDisplayName(m, "bride"))}</td>
-          <td>${esc(marriageDateLabel(m))}</td>
-          <td>${esc(m.source || "admin")}</td>
-          <td><span class="badge badge-${esc(m.status)}">${esc(statusLabel)}</span></td>
-          <td class="actions marriage-actions">
+          <td data-label="Certificate">${esc(m.certificateNo)}${pinHint ? `<div class="muted" style="font-size:.75rem">${esc(pinHint)}</div>` : ""}</td>
+          <td data-label="Groom">${esc(marriageDisplayName(m, "groom"))}</td>
+          <td data-label="Bride">${esc(marriageDisplayName(m, "bride"))}</td>
+          <td data-label="Marriage date">${esc(marriageDateLabel(m))}</td>
+          <td data-label="Application date">${esc(appliedDateLabel(m))}</td>
+          <td data-label="Source">${esc(m.source || "admin")}</td>
+          <td data-label="Status"><span class="badge badge-${esc(m.status)}">${esc(statusLabel)}</span></td>
+          <td class="actions marriage-actions" data-label="Actions">
             ${can("marriage", "update") ? `<button class="btn btn-secondary btn-sm" data-edit="${payload}">Edit</button>` : ""}
             <button class="btn btn-secondary btn-sm" data-view="${payload}">View</button>
             ${
@@ -508,15 +561,16 @@ async function loadMarriages() {
             ${
               isApproved && m.downloadPin
                 ? `${can("marriage", "approve") ? `<button class="btn btn-primary btn-sm" data-sms="${payload}">Send PIN</button>` : ""}
-                   <a class="btn btn-gold btn-sm" href="${pdfUrl}" target="_blank">Download PDF</a>`
+                   <button type="button" class="btn btn-gold btn-sm" data-pdf="${esc(m.id)}" data-pdf-name="${esc(m.certificateNo || "Nikah-Nama")}">PDF</button>`
                 : ""
             }
+            ${can("marriage", "update") || can("marriage", "approve") ? `<button class="btn btn-secondary btn-sm" data-sign="${esc(m.id)}">Signatures</button>` : ""}
             ${can("marriage", "delete") ? `<button class="btn btn-danger btn-sm" onclick="deleteMarriage('${m.id}')">Delete</button>` : ""}
           </td>
         </tr>`;
         })
         .join("")
-    : `<tr><td colspan="7" class="muted">No marriage registrations yet. Public form: /nikah-nama.html</td></tr>`;
+    : `<tr><td colspan="8" class="muted">No marriage registrations yet. Public form: /nikah-nama.html</td></tr>`;
 
   document.querySelectorAll("#marriagesTable [data-edit]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -536,7 +590,68 @@ async function loadMarriages() {
       openSmsModal(JSON.parse(decodeURIComponent(btn.getAttribute("data-sms"))));
     });
   });
+  document.querySelectorAll("#marriagesTable [data-pdf]").forEach((btn) => {
+    btn.addEventListener("click", () => openPdfPreview(btn.getAttribute("data-pdf"), btn.getAttribute("data-pdf-name")));
+  });
+  document.querySelectorAll("#marriagesTable [data-sign]").forEach((btn) => {
+    btn.addEventListener("click", () => openSignatureModal(btn.getAttribute("data-sign")));
+  });
 }
+
+let pdfPreviewBlobUrl = null;
+
+async function openPdfPreview(id, name) {
+  const safeName = String(name || "Nikah-Nama").replace(/[^\w.-]+/g, "-");
+  const host = document.getElementById("pdfPreviewPages");
+  const modal = document.getElementById("pdfPreviewModal");
+  host.innerHTML = `<p class="muted">Loading PDF…</p>`;
+  modal.classList.remove("hidden");
+  try {
+    const res = await fetch(`/api/marriages/${encodeURIComponent(id)}/pdf?inline=1`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Could not open the PDF");
+    }
+    const bytes = await res.arrayBuffer();
+    if (pdfPreviewBlobUrl) URL.revokeObjectURL(pdfPreviewBlobUrl);
+    pdfPreviewBlobUrl = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+    const link = document.getElementById("pdfPreviewDownload");
+    link.href = pdfPreviewBlobUrl;
+    link.download = `${safeName}.pdf`;
+    if (!window.pdfjsLib) throw new Error("PDF viewer did not load");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    const doc = await pdfjsLib.getDocument({ data: bytes.slice(0) }).promise;
+    host.innerHTML = "";
+    const width = Math.max(320, host.clientWidth - 24);
+    for (let pageNumber = 1; pageNumber <= doc.numPages; pageNumber += 1) {
+      const page = await doc.getPage(pageNumber);
+      const base = page.getViewport({ scale: 1 });
+      const viewport = page.getViewport({ scale: width / base.width });
+      const canvas = document.createElement("canvas");
+      canvas.className = "pdf-preview-page";
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      host.appendChild(canvas);
+      await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+    }
+  } catch (err) {
+    host.innerHTML = `<p class="alert alert-error">${esc(err.message || "Could not open the PDF")}</p>`;
+  }
+}
+
+function closePdfPreview() {
+  document.getElementById("pdfPreviewModal").classList.add("hidden");
+  document.getElementById("pdfPreviewPages").innerHTML = "";
+  if (pdfPreviewBlobUrl) {
+    URL.revokeObjectURL(pdfPreviewBlobUrl);
+    pdfPreviewBlobUrl = null;
+  }
+}
+
+document.getElementById("closePdfPreview")?.addEventListener("click", closePdfPreview);
+document.getElementById("pdfPreviewModal")?.addEventListener("click", (event) => {
+  if (event.target.id === "pdfPreviewModal") closePdfPreview();
+});
 
 function resetMarriageForm() {
   document.getElementById("marriageForm").reset();
@@ -546,7 +661,8 @@ function resetMarriageForm() {
   document.getElementById("marriageForm").classList.add("hidden");
 }
 
-window.editMarriage = function (m) {
+window.editMarriage = async function (m) {
+  await ensureNikahFormConfig();
   document.getElementById("marriageForm").classList.remove("hidden");
   document.getElementById("marriageId").value = m.id || "";
   MARRIAGE_FIELDS.forEach((k) => {
@@ -571,6 +687,7 @@ window.editMarriage = function (m) {
   }
   document.getElementById("marriageStatus").value = m.status || "pending";
   document.getElementById("marriageNotes").value = m.notes || "";
+  renderMarriageExtra(m);
   setCertifierDefaultsIfEmpty();
   document.getElementById("marriageForm").scrollIntoView({ behavior: "smooth" });
 };
@@ -582,9 +699,10 @@ window.approveMarriage = async function (id, downloadPin) {
     return;
   }
   const current = await api(`/api/marriages/${id}`);
+  const certifierSignId = document.getElementById("approveCertifier")?.value || "";
   const updated = await api(`/api/marriages/${id}`, {
     method: "PUT",
-    body: JSON.stringify({ ...current, status: "approved", downloadPin: pin }),
+    body: JSON.stringify({ ...current, status: "approved", downloadPin: pin, certifierSignId }),
   });
   document.getElementById("marriageApproveModal").classList.add("hidden");
   resetMarriageForm();
@@ -722,11 +840,469 @@ function setCertifierDefaultsIfEmpty() {
   year.value = String(d.getFullYear());
 }
 
-document.getElementById("addMarriageBtn").addEventListener("click", () => {
+function renderMarriageExtra(record) {
+  const root = document.getElementById("marriageExtraFields");
+  const section = document.getElementById("marriageExtraSection");
+  const custom = (nikahFormConfig?.fields || []).filter((field) => field.kind === "custom");
+  if (!custom.length) {
+    root.innerHTML = "";
+    section.classList.add("hidden");
+    return;
+  }
+  section.classList.remove("hidden");
+  root.innerHTML = custom
+    .map((field) => {
+      const value = record?.extraFields?.[field.key] || "";
+      const control =
+        field.input === "textarea"
+          ? `<textarea data-extra="${esc(field.key)}">${esc(value)}</textarea>`
+          : `<input data-extra="${esc(field.key)}" value="${esc(value)}">`;
+      return `<div class="form-group full"><label>${esc(field.label)}</label>${control}</div>`;
+    })
+    .join("");
+}
+
+async function ensureNikahFormConfig() {
+  if (nikahFormConfig) return nikahFormConfig;
+  nikahFormConfig = await api("/api/public/nikah-form");
+  return nikahFormConfig;
+}
+
+function toggleButton(required, attr) {
+  const on = required ? "on" : "";
+  return `<button type="button" class="req-toggle ${on}" ${attr} aria-pressed="${required ? "true" : "false"}">${required ? "On" : "Off"}</button>`;
+}
+
+function bindRequiredToggles(root) {
+  root.querySelectorAll(".req-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const on = !btn.classList.contains("on");
+      btn.classList.toggle("on", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.textContent = on ? "On" : "Off";
+    });
+  });
+}
+
+function certificatePreview(prefix, middle, next, year) {
+  const safePrefix =
+    String(prefix || "NN").replace(/[^A-Za-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "").slice(0, 24) ||
+    "NN";
+  const safeYear = /^\d{4}$/.test(String(year || "")) ? String(year) : String(new Date().getFullYear());
+  const auto = String(Math.max(1, Number(next) || 1)).padStart(4, "0");
+  const code = String(middle || "").replace(/[^A-Za-z0-9]/g, "").slice(0, 12);
+  const parts = [safePrefix];
+  if (code && code !== auto) parts.push(code);
+  parts.push(auto, safeYear);
+  return parts.filter(Boolean).join("-");
+}
+
+function renderNikahFieldEditor() {
+  const root = document.getElementById("nikahFieldsBody");
+  const groups = [];
+  (nikahFormConfig.fields || []).forEach((field) => {
+    let group = groups.find((item) => item.name === field.group);
+    if (!group) {
+      group = { name: field.group, fields: [] };
+      groups.push(group);
+    }
+    group.fields.push(field);
+  });
+  root.innerHTML = groups
+    .map(
+      (group) => `<div class="form-section">
+        <h4 class="form-section-title">${esc(group.name)}</h4>
+        ${group.fields
+          .map((field) => {
+            if (field.kind === "custom") {
+              return `<div class="form-grid" data-custom="${esc(field.key)}" style="margin-bottom:8px">
+                <div class="form-group"><label>Label</label><input data-label value="${esc(field.label)}"></div>
+                <div class="form-group"><label>Type</label>
+                  <select data-input>
+                    <option value="text" ${field.input === "text" ? "selected" : ""}>Text</option>
+                    <option value="textarea" ${field.input === "textarea" ? "selected" : ""}>Long text</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>Required</label>${toggleButton(field.required, "data-required")}</div>
+                <div class="form-group"><label>&nbsp;</label><button type="button" class="btn btn-danger btn-sm" data-remove-custom>Remove</button></div>
+              </div>`;
+            }
+            return `<div class="req-row">
+              <span>${esc(field.label)}</span>
+              ${toggleButton(field.required, `data-builtin="${esc(field.key)}"`)}
+            </div>`;
+          })
+          .join("")}
+      </div>`
+    )
+    .join("");
+  bindRequiredToggles(root);
+  root.querySelectorAll("[data-remove-custom]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.closest("[data-custom]").dataset.custom;
+      nikahFormConfig.fields = nikahFormConfig.fields.filter((field) => field.key !== key);
+      renderNikahFieldEditor();
+    });
+  });
+}
+
+function readNikahFieldEditor() {
+  const fields = (nikahFormConfig.fields || []).map((field) => ({ ...field }));
+  document.querySelectorAll("#nikahFieldsBody [data-builtin]").forEach((box) => {
+    const field = fields.find((item) => item.key === box.dataset.builtin);
+    if (field) field.required = box.classList.contains("on");
+  });
+  document.querySelectorAll("#nikahFieldsBody [data-custom]").forEach((row) => {
+    const field = fields.find((item) => item.key === row.dataset.custom);
+    if (!field) return;
+    field.label = row.querySelector("[data-label]").value.trim();
+    field.input = row.querySelector("[data-input]").value;
+    field.required = row.querySelector("[data-required]").classList.contains("on");
+  });
+  return {
+    fields: fields.filter((field) => field.kind !== "custom" || field.label),
+  };
+}
+
+async function openSignatureModal(id) {
+  const marriage = await api(`/api/marriages/${encodeURIComponent(id)}`);
+  document.getElementById("signatureModalTitle").textContent =
+    `Signatures · ${marriage.certificateNo || ""}`;
+  const rows = SIGN_ROLE_LABELS.map(([key, label]) => {
+    const slot = marriage.signatures?.[key] || { status: "none" };
+    const img =
+      slot.status === "none"
+        ? ""
+        : `<img alt="" src="/api/marriages/${encodeURIComponent(id)}/signatures/${key}/image" style="height:42px;background:#fff;border:1px solid #ddd">`;
+    const approve =
+      slot.status === "pending" && can("marriage", "approve")
+        ? `<button class="btn btn-primary btn-sm" data-approve-sign="${key}">Approve</button>`
+        : "";
+    const allow =
+      slot.status !== "none" && can("marriage", "update")
+        ? `<button class="btn btn-secondary btn-sm" data-allow-sign="${key}">Allow edit</button>`
+        : "";
+    return `<div class="detail-item" style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin:8px 0">
+      <div><strong>${esc(label)}</strong><div class="muted">${esc(slot.status || "none")}${slot.allowEdit && slot.status !== "none" ? " · edit allowed" : ""}</div></div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${img}
+        ${
+          key === "certifier"
+            ? `<span class="muted">Chosen when you approve</span>`
+            : `<button type="button" class="btn btn-secondary btn-sm" data-copy-sign="${esc(key)}">Copy link</button>
+               <label class="btn btn-secondary btn-sm">Upload<input type="file" accept="image/png,image/jpeg" hidden data-upload-sign="${esc(key)}"></label>`
+        }
+        ${approve}${allow}
+      </div>
+    </div>`;
+  }).join("");
+  const eachFields = SIGN_ROLE_LABELS.filter(([key]) => key !== "certifier").map(
+    ([key, label]) => `<div class="form-group"><label>${esc(label)}</label><input data-sign-to="${key}" placeholder="Mobile or email"></div>`
+  ).join("");
+  document.getElementById("signatureModalBody").innerHTML = `
+    ${rows}
+    <div class="form-section">
+      <h4 class="form-section-title">Send signature link</h4>
+      <div class="form-grid">
+        <div class="form-group"><label>How</label>
+          <select id="signLinkMode"><option value="each">Separate link for each person</option><option value="one">One link — they choose whose signature</option></select>
+        </div>
+        <div class="form-group"><label>Send by</label>
+          <select id="signLinkChannel"><option value="sms">SMS</option><option value="email">Email</option></select>
+        </div>
+        <div class="form-group full" id="signOneWrap" hidden><label>Mobile or email</label><input id="signOneTo"></div>
+        <div class="form-grid full" id="signEachWrap">${eachFields}</div>
+      </div>
+      <div class="actions" style="margin-top:10px">
+        <button type="button" class="btn btn-secondary" id="copyAllSignLink">Copy one link for everyone</button>
+        <button type="button" class="btn btn-primary" id="sendSignLinksBtn">Send link</button>
+      </div>
+      <p class="muted" id="signLinkStatus"></p>
+    </div>`;
+  document.getElementById("signatureModal").classList.remove("hidden");
+  const signLinkFor = (token) =>
+    `${location.origin}/sign-nikah.html?t=${encodeURIComponent(token || "")}`;
+  const copyText = async (text, button) => {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      const area = document.createElement("textarea");
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+    }
+    const previous = button.textContent;
+    button.textContent = "Copied";
+    setTimeout(() => {
+      button.textContent = previous;
+    }, 1200);
+  };
+  document.getElementById("signatureModalBody").querySelectorAll("[data-copy-sign]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const token = marriage.signatures?.[btn.dataset.copySign]?.token;
+      copyText(signLinkFor(token), btn);
+    });
+  });
+  document.getElementById("signatureModalBody").querySelectorAll("[data-upload-sign]").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const file = input.files && input.files[0];
+      input.value = "";
+      if (!file) return;
+      const canvas = document.createElement("canvas");
+      canvas.width = 900;
+      canvas.height = 320;
+      const ctx = canvas.getContext("2d");
+      try {
+        const placed = await placeCleanSignature(file, ctx, canvas);
+        if (!placed) {
+          alert("Could not find a signature in that picture.");
+          return;
+        }
+        await api(
+          `/api/marriages/${encodeURIComponent(id)}/signatures/${encodeURIComponent(input.dataset.uploadSign)}/upload`,
+          {
+            method: "POST",
+            body: JSON.stringify({ image: canvas.toDataURL("image/png") }),
+          }
+        );
+        openSignatureModal(id);
+      } catch (err) {
+        alert(err.message || "Could not upload signature");
+      }
+    });
+  });
+  document.getElementById("copyAllSignLink").addEventListener("click", (event) => {
+    copyText(signLinkFor(marriage.signBundleToken), event.currentTarget);
+  });
+  const mode = document.getElementById("signLinkMode");
+  const toggleMode = () => {
+    const one = mode.value === "one";
+    document.getElementById("signOneWrap").hidden = !one;
+    document.getElementById("signEachWrap").hidden = one;
+  };
+  mode.addEventListener("change", toggleMode);
+  document.getElementById("signatureModalBody").querySelectorAll("[data-approve-sign]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await api(`/api/marriages/${encodeURIComponent(id)}/signatures/${btn.dataset.approveSign}/approve`, { method: "POST" });
+      openSignatureModal(id);
+      loadMarriages();
+    });
+  });
+  document.getElementById("signatureModalBody").querySelectorAll("[data-allow-sign]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await api(`/api/marriages/${encodeURIComponent(id)}/signatures/${btn.dataset.allowSign}/allow-edit`, { method: "POST" });
+      openSignatureModal(id);
+    });
+  });
+  document.getElementById("sendSignLinksBtn").addEventListener("click", async () => {
+    const channel = document.getElementById("signLinkChannel").value;
+    const status = document.getElementById("signLinkStatus");
+    status.textContent = "Sending…";
+    try {
+      let body;
+      if (mode.value === "one") {
+        const to = document.getElementById("signOneTo").value.trim();
+        body = channel === "email" ? { mode: "one", channel, email: to } : { mode: "one", channel, mobile: to };
+      } else {
+        const recipients = [];
+        document.querySelectorAll("[data-sign-to]").forEach((input) => {
+          const to = input.value.trim();
+          if (!to) return;
+          recipients.push(
+            channel === "email"
+              ? { role: input.dataset.signTo, email: to }
+              : { role: input.dataset.signTo, mobile: to }
+          );
+        });
+        body = { mode: "each", channel, recipients };
+      }
+      const data = await api(`/api/marriages/${encodeURIComponent(id)}/send-signature-links`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+      status.textContent = data.message || "Sent";
+    } catch (err) {
+      status.textContent = err.message || "Send failed";
+    }
+  });
+}
+
+document.getElementById("addMarriageBtn").addEventListener("click", async () => {
   resetMarriageForm();
   document.getElementById("marriageStatus").value = "pending";
+  await ensureNikahFormConfig();
+  renderMarriageExtra(null);
   setCertifierDefaultsIfEmpty();
   document.getElementById("marriageForm").classList.remove("hidden");
+});
+document.getElementById("nikahFieldsBtn").addEventListener("click", async () => {
+  nikahFormConfig = await api("/api/public/nikah-form");
+  renderNikahFieldEditor();
+  document.getElementById("nikahFieldsModal").classList.remove("hidden");
+});
+document.getElementById("closeNikahFields").addEventListener("click", () => {
+  document.getElementById("nikahFieldsModal").classList.add("hidden");
+});
+document.getElementById("certPrefixBtn").addEventListener("click", async () => {
+  nikahFormConfig = await api("/api/public/nikah-form");
+  const prefix = nikahFormConfig.certificatePrefix || "KKT";
+  const year = nikahFormConfig.certificateYear || String(new Date().getFullYear());
+  const next = nikahFormConfig.certificateNext || 1;
+  document.getElementById("certificatePrefix").value = prefix;
+  document.getElementById("certificateYear").value = year;
+  document.getElementById("certificateMiddle").value = String(Math.max(1, Number(next) || 1)).padStart(4, "0");
+  const refresh = () => {
+    document.getElementById("certificatePreview").value = certificatePreview(
+      document.getElementById("certificatePrefix").value,
+      next,
+      document.getElementById("certificateYear").value
+    );
+  };
+  ["certificatePrefix", "certificateYear"].forEach((id) => {
+    document.getElementById(id).oninput = refresh;
+  });
+  refresh();
+  document.getElementById("certPrefixModal").classList.remove("hidden");
+});
+document.getElementById("closeCertPrefix").addEventListener("click", () => {
+  document.getElementById("certPrefixModal").classList.add("hidden");
+});
+document.getElementById("saveCertPrefixBtn").addEventListener("click", async () => {
+  const payload = {
+    fields: nikahFormConfig.fields || [],
+    certificatePrefix: document.getElementById("certificatePrefix").value.trim(),
+    certificateCode: "",
+    certificateYear: document.getElementById("certificateYear").value.trim(),
+  };
+  nikahFormConfig = await api("/api/nikah-form", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+  document.getElementById("certPrefixModal").classList.add("hidden");
+  alert("Standard certificate number saved: " + (nikahFormConfig.certificateExample || ""));
+});
+
+const certifierPad = document.getElementById("certifierPad");
+const certifierCtx = certifierPad.getContext("2d");
+certifierCtx.lineWidth = 3;
+certifierCtx.lineCap = "round";
+certifierCtx.strokeStyle = "#143826";
+let certifierDirty = false;
+let certifierDrawing = false;
+function certifierPoint(event) {
+  const rect = certifierPad.getBoundingClientRect();
+  return {
+    x: ((event.clientX - rect.left) / rect.width) * certifierPad.width,
+    y: ((event.clientY - rect.top) / rect.height) * certifierPad.height,
+  };
+}
+certifierPad.addEventListener("pointerdown", (event) => {
+  certifierDrawing = true;
+  certifierDirty = true;
+  const point = certifierPoint(event);
+  certifierCtx.beginPath();
+  certifierCtx.moveTo(point.x, point.y);
+});
+certifierPad.addEventListener("pointermove", (event) => {
+  if (!certifierDrawing) return;
+  const point = certifierPoint(event);
+  certifierCtx.lineTo(point.x, point.y);
+  certifierCtx.stroke();
+});
+certifierPad.addEventListener("pointerup", () => {
+  certifierDrawing = false;
+});
+document.getElementById("clearCertifierPad").addEventListener("click", () => {
+  certifierCtx.clearRect(0, 0, certifierPad.width, certifierPad.height);
+  certifierDirty = false;
+});
+document.getElementById("certifierFile").addEventListener("change", (event) => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  placeCleanSignature(file, certifierCtx, certifierPad)
+    .then((placed) => {
+      certifierDirty = placed;
+      if (!placed) alert("Could not find a signature in that picture.");
+    })
+    .catch(() => alert("Could not read that signature."));
+});
+
+async function loadCertifierSigns() {
+  const signs = await api("/api/certifier-signs");
+  const root = document.getElementById("certifierSignsList");
+  root.innerHTML = signs.length
+    ? signs
+        .map(
+          (sign) => `<div style="display:flex;gap:10px;align-items:center;justify-content:space-between;margin:8px 0">
+            <div><strong>${esc(sign.name)}</strong></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <img alt="" src="/api/certifier-signs/${encodeURIComponent(sign.id)}/image" style="height:42px;background:#fff;border:1px solid #ddd">
+              <button type="button" class="btn btn-danger btn-sm" data-delete-certifier="${esc(sign.id)}">Delete</button>
+            </div>
+          </div>`
+        )
+        .join("")
+    : `<p class="muted">No saved certifier signatures yet.</p>`;
+  root.querySelectorAll("[data-delete-certifier]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Delete this saved signature?")) return;
+      await api(`/api/certifier-signs/${encodeURIComponent(btn.dataset.deleteCertifier)}`, { method: "DELETE" });
+      loadCertifierSigns();
+    });
+  });
+}
+
+document.getElementById("certifierSignsBtn").addEventListener("click", async () => {
+  await loadCertifierSigns();
+  document.getElementById("certifierSignsModal").classList.remove("hidden");
+});
+document.getElementById("closeCertifierSigns").addEventListener("click", () => {
+  document.getElementById("certifierSignsModal").classList.add("hidden");
+});
+document.getElementById("saveCertifierSign").addEventListener("click", async () => {
+  const name = document.getElementById("newCertifierName").value.trim();
+  if (!name) {
+    alert("Enter the certifier name.");
+    return;
+  }
+  if (!certifierDirty) {
+    alert("Draw or upload a signature first.");
+    return;
+  }
+  await api("/api/certifier-signs", {
+    method: "POST",
+    body: JSON.stringify({ name, image: certifierPad.toDataURL("image/png") }),
+  });
+  document.getElementById("newCertifierName").value = "";
+  certifierCtx.clearRect(0, 0, certifierPad.width, certifierPad.height);
+  certifierDirty = false;
+  loadCertifierSigns();
+});
+
+document.getElementById("addNikahFieldBtn").addEventListener("click", () => {
+  nikahFormConfig.fields.push({
+    key: `c${Math.random().toString(16).slice(2, 10)}`,
+    label: "",
+    group: "Extra",
+    input: "text",
+    kind: "custom",
+    required: false,
+  });
+  renderNikahFieldEditor();
+});
+document.getElementById("saveNikahFieldsBtn").addEventListener("click", async () => {
+  const payload = readNikahFieldEditor();
+  nikahFormConfig = await api("/api/nikah-form", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+  document.getElementById("nikahFieldsModal").classList.add("hidden");
+  alert("Online form fields saved");
+});
+document.getElementById("closeSignatureModal").addEventListener("click", () => {
+  document.getElementById("signatureModal").classList.add("hidden");
 });
 document.getElementById("cancelMarriage").addEventListener("click", resetMarriageForm);
 document.getElementById("closeMarriageView").addEventListener("click", () => {
@@ -828,6 +1404,9 @@ function applyChrome() {
     ["addDonationBtn", "donations", "create"],
     ["addCollectionBtn", "collections", "create"],
     ["addMarriageBtn", "marriage", "create"],
+    ["nikahFieldsBtn", "marriage", "update"],
+    ["certPrefixBtn", "marriage", "update"],
+    ["certifierSignsBtn", "marriage", "update"],
     ["approveMarriageBtn", "marriage", "approve"],
     ["saveHeaderBtn", "content", "update"],
     ["saveMenuBtn", "content", "update"],
@@ -1036,6 +1615,7 @@ function showSettingsPanel(name) {
     panel.classList.toggle("active", panel.id === `settings-panel-${name}`);
   });
   if (name === "profile") renderMyProfile();
+  if (name === "forms" && typeof loadFormBuilder === "function") loadFormBuilder();
   if (name === "access") {
     renderAccessUserList();
     const selectedId = document.getElementById("accessUserId").value;

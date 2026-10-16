@@ -1,30 +1,49 @@
-# One-click: push local changes → GitHub → live site
-# Usage: .\deploy.ps1
-# Optional: .\deploy.ps1 "Your commit message"
+# Push local changes to GitHub. GitHub Pages rebuilds the live site.
+#   .\deploy.ps1
+#   .\deploy.ps1 -Watch
+# Live: https://abmai-me.github.io/Khadijatul-Kubra-web/
+
+param(
+  [string]$Message,
+  [switch]$Watch
+)
 
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
-
-$msg = $args[0]
-if (-not $msg) { $msg = "Update site $(Get-Date -Format 'yyyy-MM-dd HH:mm')" }
-
-git add -A
-$status = git status --porcelain
-if (-not $status) {
-  Write-Host "No local changes to upload." -ForegroundColor Yellow
-  Write-Host "Live site: https://abmai-me.github.io/Khadijatul-Kubra-web/"
-  exit 0
-}
 
 $env:GIT_AUTHOR_NAME = if ($env:GIT_AUTHOR_NAME) { $env:GIT_AUTHOR_NAME } else { "A B M ASHRAFUL ISLAM" }
 $env:GIT_AUTHOR_EMAIL = if ($env:GIT_AUTHOR_EMAIL) { $env:GIT_AUTHOR_EMAIL } else { "33477187+abmai-me@users.noreply.github.com" }
 $env:GIT_COMMITTER_NAME = $env:GIT_AUTHOR_NAME
 $env:GIT_COMMITTER_EMAIL = $env:GIT_AUTHOR_EMAIL
 
-git commit -m $msg
-git push origin main
+function Publish-Site([string]$CommitMessage) {
+  git add -A
+  $status = git status --porcelain
+  if (-not $status) { return $false }
+  if (-not $CommitMessage) { $CommitMessage = "Update site $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" }
+  git commit -m $CommitMessage
+  git push origin main
+  Write-Host "Pushed $(Get-Date -Format 'HH:mm:ss'). Live in about 1 minute:" -ForegroundColor Green
+  Write-Host "https://abmai-me.github.io/Khadijatul-Kubra-web/"
+  return $true
+}
 
-Write-Host ""
-Write-Host "Pushed. Live site updates in ~1-2 minutes:" -ForegroundColor Green
-Write-Host "https://abmai-me.github.io/Khadijatul-Kubra-web/"
-Start-Process "https://abmai-me.github.io/Khadijatul-Kubra-web/"
+if ($Watch) {
+  Write-Host "Watching for changes. Pushing to GitHub whenever files change."
+  Write-Host "https://abmai-me.github.io/Khadijatul-Kubra-web/"
+  while ($true) {
+    try {
+      Publish-Site $null | Out-Null
+    } catch {
+      Write-Host "Push failed: $($_.Exception.Message)" -ForegroundColor Red
+    }
+    Start-Sleep -Seconds 5
+  }
+}
+
+$pushed = Publish-Site $Message
+if (-not $pushed) {
+  Write-Host "No local changes to upload." -ForegroundColor Yellow
+}
+Write-Host "GitHub: https://github.com/abmai-me/Khadijatul-Kubra-web"
+Write-Host "Live:   https://abmai-me.github.io/Khadijatul-Kubra-web/"

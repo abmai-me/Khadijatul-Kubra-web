@@ -255,7 +255,7 @@
         <div class="nikah-cert-meta">
           <div class="nikah-cert-no">
             <label>Certificate No</label>
-            <input name="certificateNo" placeholder="Auto after approval" readonly>
+            <input name="certificateNo" placeholder="Prefix-0001-year" readonly>
           </div>
         </div>
       </header>
@@ -266,8 +266,8 @@
           <section class="party-card">
             <div class="party-head">Bride Groom details</div>
             <p class="form-step-intro">Enter the bridegroom information for this Nikah Nama.</p>
-            <div class="nn-field"><label>First Name *</label><input name="groomFirstName" required placeholder="First name"></div>
-            <div class="nn-field"><label>Last Name *</label><input name="groomLastName" required placeholder="Last name"></div>
+            <div class="nn-field"><label>First Name</label><input name="groomFirstName" placeholder="First name"></div>
+            <div class="nn-field"><label>Last Name</label><input name="groomLastName" placeholder="Last name"></div>
             <div class="nn-field">
               <label>Date of Birth</label>
               <div class="dob-row">
@@ -301,8 +301,8 @@
           <section class="party-card">
             <div class="party-head">Bride details</div>
             <p class="form-step-intro">Enter the bride information for this Nikah Nama.</p>
-            <div class="nn-field"><label>First Name *</label><input name="brideFirstName" required placeholder="First name"></div>
-            <div class="nn-field"><label>Last Name *</label><input name="brideLastName" required placeholder="Last name"></div>
+            <div class="nn-field"><label>First Name</label><input name="brideFirstName" placeholder="First name"></div>
+            <div class="nn-field"><label>Last Name</label><input name="brideLastName" placeholder="Last name"></div>
             <div class="nn-field">
               <label>Date of Birth</label>
               <div class="dob-row">
@@ -399,6 +399,14 @@
             </div>
           </div>
         </div>
+
+        <div id="extraFields"></div>
+
+        <section class="section-box no-print" id="signSection">
+          <div class="section-label">Signatures</div>
+          <p class="form-step-intro">Not required to submit. Draw in the box or upload a picture. If you leave it blank, the office can send an SMS or email link later. A signature is printed only after admin approval, and it cannot be changed after submit unless admin allows it.</p>
+          <div id="signPads" class="sign-grid"></div>
+        </section>
 
         <div class="step-nav no-print">
           <button type="button" class="nn-btn nn-btn-secondary" id="back3">← Back</button>
@@ -536,13 +544,22 @@
 <script src="assets/js/site-cms.js"></script>
 
 <script src="assets/js/nikah-nama.js"></script>
+<script src="assets/js/signature-clean.js"></script>
 <script>
     const msg = document.getElementById("msg");
     const form = document.getElementById("nikahForm");
     const submitBtn = document.getElementById("submitBtn");
     const contactGate = document.getElementById("contactGate");
     const formArea = document.getElementById("formArea");
+    const signPads = new Map();
     let step = 1;
+    let formConfig = null;
+
+    const GATE_FIELDS = {
+      applicantName: "gateName",
+      applicantMobile: "gateMobile",
+      applicantEmail: "gateEmail",
+    };
 
     function todayParts() {
       const d = new Date();
@@ -579,9 +596,143 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
+    function fieldLabel(input, text, required) {
+      const label = input.closest(".nn-field")?.querySelector("label");
+      if (!label) return;
+      label.textContent = text + (required ? " *" : "");
+    }
+
+    function applyFormConfig(config) {
+      formConfig = config;
+      (config.fields || []).forEach((field) => {
+        if (field.kind === "custom") return;
+        const gateId = GATE_FIELDS[field.key];
+        if (gateId) {
+          const input = document.getElementById(gateId);
+          input.required = !!field.required;
+          const label = input.closest(".nn-field")?.querySelector("label");
+          if (label) label.textContent = field.label + (field.required ? " *" : "");
+          return;
+        }
+        const input = form.querySelector(`[name="${field.key}"]`);
+        if (!input) return;
+        input.required = !!field.required;
+        const box = input.closest(".nn-field");
+        if (box && box.querySelectorAll("[name]").length === 1) {
+          fieldLabel(input, field.label, field.required);
+        }
+      });
+      const extraRoot = document.getElementById("extraFields");
+      const custom = (config.fields || []).filter((field) => field.kind === "custom");
+      extraRoot.innerHTML = custom.length
+        ? `<section class="section-box"><div class="section-label">Additional details</div>${custom
+            .map((field) => {
+              const control =
+                field.input === "textarea"
+                  ? `<textarea name="extra_${field.key}" ${field.required ? "required" : ""}></textarea>`
+                  : `<input name="extra_${field.key}" ${field.required ? "required" : ""}>`;
+              return `<div class="nn-field"><label>${field.label}${field.required ? " *" : ""}</label>${control}</div>`;
+            })
+            .join("")}</section>`
+        : "";
+      mountSignPads((config.signRoles || []).filter((role) => role.key !== "certifier"));
+      const cert = form.querySelector('[name="certificateNo"]');
+      if (cert && config.certificateExample) cert.placeholder = config.certificateExample;
+    }
+
+    function mountSignPads(roles) {
+      const root = document.getElementById("signPads");
+      root.innerHTML = roles
+        .map(
+          (role) => `<div class="sign-card" data-role="${role.key}">
+            <label>${role.label}</label>
+            <canvas width="640" height="180"></canvas>
+            <div class="sign-actions">
+              <button type="button" data-clear>Clear</button>
+              <label class="file-btn">Upload<input type="file" accept="image/png,image/jpeg" hidden></label>
+            </div>
+          </div>`
+        )
+        .join("");
+      signPads.clear();
+      root.querySelectorAll(".sign-card").forEach((card) => {
+        const canvas = card.querySelector("canvas");
+        const ctx = canvas.getContext("2d");
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#143826";
+        const state = { dirty: false, drawing: false };
+        signPads.set(card.dataset.role, { canvas, state });
+        function point(event) {
+          const rect = canvas.getBoundingClientRect();
+          const src = event.touches ? event.touches[0] : event;
+          return {
+            x: ((src.clientX - rect.left) / rect.width) * canvas.width,
+            y: ((src.clientY - rect.top) / rect.height) * canvas.height,
+          };
+        }
+        function start(event) {
+          event.preventDefault();
+          state.drawing = true;
+          state.dirty = true;
+          const p = point(event);
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+        }
+        function move(event) {
+          if (!state.drawing) return;
+          event.preventDefault();
+          const p = point(event);
+          ctx.lineTo(p.x, p.y);
+          ctx.stroke();
+        }
+        function end() {
+          state.drawing = false;
+        }
+        canvas.addEventListener("pointerdown", start);
+        canvas.addEventListener("pointermove", move);
+        canvas.addEventListener("pointerup", end);
+        canvas.addEventListener("pointerleave", end);
+        card.querySelector("[data-clear]").addEventListener("click", () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          state.dirty = false;
+        });
+        card.querySelector("input[type=file]").addEventListener("change", (event) => {
+          const file = event.target.files && event.target.files[0];
+          if (!file) return;
+          placeCleanSignature(file, ctx, canvas)
+            .then((placed) => {
+              state.dirty = placed;
+              if (!placed) showMsg("Could not find a signature in that picture.", false);
+            })
+            .catch(() => showMsg("Could not read that signature.", false));
+        });
+      });
+    }
+
+    function collectSignatures() {
+      const signatures = {};
+      signPads.forEach((pad, role) => {
+        if (!pad.state.dirty) return;
+        signatures[role] = pad.canvas.toDataURL("image/png");
+      });
+      return signatures;
+    }
+
+    function collectExtraFields() {
+      const extra = {};
+      (formConfig?.fields || [])
+        .filter((field) => field.kind === "custom")
+        .forEach((field) => {
+          const input = form.querySelector(`[name="extra_${field.key}"]`);
+          extra[field.key] = input ? input.value.trim() : "";
+        });
+      return extra;
+    }
+
     function requireStep(n) {
       const root = form.querySelector('.form-step[data-step="' + n + '"]');
-      const required = root.querySelectorAll("input[required]");
+      const required = root.querySelectorAll("input[required], textarea[required]");
       for (const input of required) {
         if (!String(input.value || "").trim()) {
           input.focus();
@@ -603,11 +754,14 @@
       const name = document.getElementById("gateName").value.trim();
       const mobile = document.getElementById("gateMobile").value.trim();
       const email = document.getElementById("gateEmail").value.trim();
-      if (!name || !mobile || !email) {
-        showMsg("Please enter name, mobile and email to continue.", false);
+      const nameRequired = document.getElementById("gateName").required;
+      const mobileRequired = document.getElementById("gateMobile").required;
+      const emailRequired = document.getElementById("gateEmail").required;
+      if ((nameRequired && !name) || (mobileRequired && !mobile) || (emailRequired && !email)) {
+        showMsg("Please fill the required contact details.", false);
         return;
       }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showMsg("Enter a valid email address.", false);
         document.getElementById("gateEmail").focus();
         return;
@@ -642,6 +796,10 @@
     document.getElementById("back3").addEventListener("click", () => goStep(2));
 
     setCertifierToday();
+    fetch("/api/public/nikah-form")
+      .then((res) => res.json())
+      .then((config) => applyFormConfig(config))
+      .catch(() => {});
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -660,6 +818,8 @@
       try {
         const body = NikahNama.readForm(form);
         body.status = "pending";
+        body.extraFields = collectExtraFields();
+        body.signatures = collectSignatures();
         const res = await fetch("/api/public/marriages", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

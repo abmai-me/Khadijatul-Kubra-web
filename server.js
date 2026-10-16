@@ -7,6 +7,35 @@ const { v4: uuidv4 } = require("uuid");
 require("./assets/js/nikah-nama.js");
 const { normalizeNikah } = global.NikahNama;
 const { fillNikahPdf } = require("./lib/nikah-pdf");
+const {
+  categoryKey,
+  fieldsForCategory,
+  sourceList,
+  valueOf,
+  recordLabel,
+  cleanFields,
+  fillTemplatePdf,
+} = require("./lib/form-fill");
+const {
+  cleanFontFamily,
+  isReservedFamily,
+  customFamilies,
+  publicFontList,
+  isFontBytes,
+  readFormFontBytes,
+} = require("./lib/form-fonts");
+const {
+  SIGN_ROLES,
+  mergeNikahForm,
+  publicNikahForm,
+  cleanLabel,
+  cleanCertificatePrefix,
+  cleanCertificateCode,
+  cleanCertificateNo,
+  cleanCertificateYear,
+  formatCertificateNo,
+  cleanCertificateNo,
+} = require("./lib/nikah-form");
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -19,9 +48,15 @@ const CMS_FILE = path.join(DATA_DIR, "cms.json");
 const SMS_OUTBOX_FILE = path.join(DATA_DIR, "sms-outbox.json");
 const EMAIL_OUTBOX_FILE = path.join(DATA_DIR, "email-outbox.json");
 const AVATAR_DIR = path.join(DATA_DIR, "avatars");
+const SIGNATURE_DIR = path.join(DATA_DIR, "signatures");
+const FORM_DIR = path.join(DATA_DIR, "form-templates");
+const FONT_DIR = path.join(DATA_DIR, "fonts");
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(AVATAR_DIR)) fs.mkdirSync(AVATAR_DIR, { recursive: true });
+if (!fs.existsSync(SIGNATURE_DIR)) fs.mkdirSync(SIGNATURE_DIR, { recursive: true });
+if (!fs.existsSync(FORM_DIR)) fs.mkdirSync(FORM_DIR, { recursive: true });
+if (!fs.existsSync(FONT_DIR)) fs.mkdirSync(FONT_DIR, { recursive: true });
 
 // Seed JSON data from repo defaults when the data disk/volume is empty.
 for (const [target, seedName] of [
@@ -267,6 +302,142 @@ function verifyUrlFor(req, marriage) {
   )}`;
 }
 
+function emptySignatureSlot() {
+  return {
+    status: "none",
+    token: uuidv4().replace(/-/g, ""),
+    file: "",
+    allowEdit: true,
+    submittedAt: null,
+    approvedAt: null,
+  };
+}
+
+function ensureSignatureSlots(marriage) {
+  const signatures = { ...(marriage.signatures || {}) };
+  for (const role of SIGN_ROLES) {
+    const current = signatures[role.key] || {};
+    signatures[role.key] = {
+      ...emptySignatureSlot(),
+      ...current,
+      token: current.token || uuidv4().replace(/-/g, ""),
+      status: ["none", "pending", "approved"].includes(current.status)
+        ? current.status
+        : "none",
+      allowEdit: current.status === "none" ? true : current.allowEdit === true,
+    };
+  }
+  marriage.signatures = signatures;
+  if (!marriage.signBundleToken) {
+    marriage.signBundleToken = uuidv4().replace(/-/g, "");
+  }
+  return marriage;
+}
+
+function signaturePublicView(slot, role) {
+  return {
+    role: role.key,
+    label: role.label,
+    status: slot?.status || "none",
+    submittedAt: slot?.submittedAt || null,
+    approvedAt: slot?.approvedAt || null,
+    allowEdit: slot?.status === "none" || slot?.allowEdit === true,
+    locked: slot?.status !== "none" && slot?.allowEdit !== true && !!slot?.file,
+  };
+}
+
+function decodeSignaturePng(value) {
+  const match = String(value || "").match(/^data:image\/png;base64,([A-Za-z0-9+/=\s]+)$/);
+  if (!match) return null;
+  const bytes = Buffer.from(match[1].replace(/\s+/g, ""), "base64");
+  if (bytes.length < 40 || bytes.length > 450000) return null;
+  if (bytes[0] !== 0x89 || bytes[1] !== 0x50) return null;
+  return bytes;
+}
+
+function saveSignatureFile(marriageId, role, bytes) {
+  const filename = `${marriageId}-${role}.png`;
+  const file = path.join(SIGNATURE_DIR, filename);
+  fs.writeFileSync(file, bytes);
+  return file;
+}
+
+function canReplaceSignature(slot) {
+  if (!slot || slot.status === "none" || !slot.file) return true;
+  return slot.allowEdit === true;
+}
+
+function applySignatureUpload(marriage, role, dataUrl) {
+  const known = SIGN_ROLES.some((item) => item.key === role);
+  if (!known) return { error: "Unknown signature" };
+  ensureSignatureSlots(marriage);
+  const slot = marriage.signatures[role];
+  if (!canReplaceSignature(slot)) {
+    return { error: "This signature is already submitted and cannot be changed" };
+  }
+  const bytes = decodeSignaturePng(dataUrl);
+  if (!bytes) return { error: "Signature image must be a PNG" };
+  slot.file = saveSignatureFile(marriage.id, role, bytes);
+  slot.status = "pending";
+  slot.allowEdit = false;
+  slot.submittedAt = new Date().toISOString();
+  slot.approvedAt = null;
+  return { ok: true };
+}
+
+function sanitizeExtraFields(body, form) {
+  const custom = form.fields.filter((field) => field.kind === "custom");
+  const source = body && typeof body === "object" ? body : {};
+  const extra = {};
+  custom.forEach((field) => {
+    extra[field.key] = String(source[field.key] || "").trim().slice(0, 500);
+  });
+  return extra;
+}
+
+function missingRequiredFields(marriage, form) {
+  const missing = [];
+  form.fields.forEach((field) => {
+    if (!field.required) return;
+    const value =
+      field.kind === "custom" ? marriage.extraFields?.[field.key] : marriage[field.key];
+    if (!String(value || "").trim()) missing.push(field.label);
+  });
+  return missing;
+}
+
+function issueCertificateNo(store) {
+  const current = mergeNikahForm(store.nikahForm);
+  const next = Math.max(1, Number(current.certificateNext) || 1);
+  const number = formatCertificateNo(current, next);
+  store.nikahForm = {
+    ...(store.nikahForm || {}),
+    fields: current.fields,
+    certificatePrefix: current.certificatePrefix,
+    certificateCode: current.certificateCode,
+    certificateYear: current.certificateYear,
+    certificateNext: next + 1,
+  };
+  return number;
+}
+
+function findMarriageBySignToken(store, token) {
+  const needle = String(token || "").trim();
+  if (!needle) return null;
+  for (const marriage of store.marriages) {
+    if (marriage.signBundleToken === needle) {
+      return { marriage, role: null };
+    }
+    const signatures = marriage.signatures || {};
+    for (const role of SIGN_ROLES) {
+      if (signatures[role.key]?.token === needle) {
+        return { marriage, role: role.key };
+      }
+    }
+  }
+  return null;
+}
+
 function buildMarriage(body, existing = null, options = {}) {
   const fields = normalizeNikah(body || {});
   const now = new Date().toISOString();
@@ -282,9 +453,10 @@ function buildMarriage(body, existing = null, options = {}) {
     status = existing?.status || "pending";
   }
 
-  let certificateNo = existing?.certificateNo || fields.certificateNo || "";
-  if (!certificateNo) {
-    certificateNo = `NN-${Date.now().toString().slice(-8)}`;
+  let certificateNo = existing?.certificateNo || "";
+  if (options.allowCertificateEdit) {
+    const typed = cleanCertificateNo(body?.certificateNo);
+    if (typed) certificateNo = typed;
   }
 
   const incomingPin = normalizePin(body?.downloadPin ?? fields.downloadPin);
@@ -298,7 +470,7 @@ function buildMarriage(body, existing = null, options = {}) {
     if (status === "rejected") downloadPin = existing?.downloadPin || downloadPin;
   }
 
-  return {
+  const record = {
     ...(existing || {}),
     ...fields,
     id: existing?.id || uuidv4(),
@@ -316,6 +488,9 @@ function buildMarriage(body, existing = null, options = {}) {
     pinEmailSentAt: existing?.pinEmailSentAt || null,
     downloadToken: existing?.downloadToken || uuidv4(),
     verifyCode: existing?.verifyCode || uuidv4().replace(/-/g, "").slice(0, 12),
+    extraFields: existing?.extraFields || {},
+    signatures: existing?.signatures || {},
+    signBundleToken: existing?.signBundleToken || "",
     createdAt: existing?.createdAt || now,
     updatedAt: now,
     approvedAt:
@@ -325,6 +500,7 @@ function buildMarriage(body, existing = null, options = {}) {
         ? null
         : existing?.approvedAt || null,
   };
+  return ensureSignatureSlots(record);
 }
 
 async function sendFilledNikahPdf(req, res, marriage) {
@@ -341,12 +517,24 @@ async function sendFilledNikahPdf(req, res, marriage) {
         marriage = store.marriages[idx];
       }
     }
-    const pdf = await fillNikahPdf(marriage, verifyUrlFor(req, marriage));
+    const verifyUrl = verifyUrlFor(req, marriage);
+    const store = readStore();
+    const template = (store.formTemplates || []).find(
+      (item) =>
+        item.active &&
+        categoryKey(item.category) === "marriage" &&
+        Array.isArray(item.fields) &&
+        item.fields.length > 0 &&
+        fs.existsSync(formPdfPath(item.id))
+    );
+    const pdf = template
+      ? await buildFilledForm("Marriage", marriage.id, { qr: verifyUrl }, template.id)
+      : await fillNikahPdf(marriage, verifyUrl);
     const filename = `${marriage.certificateNo || "Nikah-Nama"}.pdf`;
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${filename}"`
+      `${req.query.inline === "1" ? "inline" : "attachment"}; filename="${filename}"`
     );
     res.send(pdf);
   } catch (err) {
@@ -373,7 +561,7 @@ function writeCms(data) {
 }
 
 app.set("trust proxy", 1);
-app.use(express.json({ limit: "6mb" }));
+app.use(express.json({ limit: "12mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
@@ -1040,25 +1228,81 @@ app.put("/api/prayer-times", requirePerm("prayer", "update"), (req, res) => {
   res.json(store.prayerTimes);
 });
 
+app.get("/api/public/nikah-form", (req, res) => {
+  res.json(publicNikahForm(readStore().nikahForm));
+});
+
+app.put("/api/nikah-form", requirePerm("marriage", "update"), (req, res) => {
+  const store = readStore();
+  const incoming = Array.isArray(req.body?.fields) ? req.body.fields : [];
+  const custom = [];
+  incoming
+    .filter((field) => field && field.kind === "custom")
+    .slice(0, 12)
+    .forEach((field) => {
+      const label = cleanLabel(field.label);
+      if (!label) return;
+      const key = /^c[a-z0-9]{6,12}$/.test(String(field.key || ""))
+        ? String(field.key)
+        : `c${uuidv4().replace(/-/g, "").slice(0, 8)}`;
+      custom.push({
+        key,
+        kind: "custom",
+        label,
+        input: field.input === "textarea" ? "textarea" : "text",
+        required: !!field.required,
+      });
+    });
+  const merged = mergeNikahForm({
+    fields: incoming.filter((field) => field && field.kind !== "custom").concat(custom),
+    certificatePrefix: req.body?.certificatePrefix,
+    certificateNext: store.nikahForm?.certificateNext,
+  });
+  store.nikahForm = {
+    ...(store.nikahForm || {}),
+    fields: merged.fields,
+    certificatePrefix: cleanCertificatePrefix(
+      req.body?.certificatePrefix ?? store.nikahForm?.certificatePrefix
+    ),
+    certificateCode: cleanCertificateCode(
+      req.body?.certificateCode ?? store.nikahForm?.certificateCode
+    ),
+    certificateYear: cleanCertificateYear(
+      req.body?.certificateYear ?? store.nikahForm?.certificateYear
+    ),
+    certificateNext: Math.max(1, Number(store.nikahForm?.certificateNext) || 1),
+  };
+  writeStore(store);
+  res.json(publicNikahForm(store.nikahForm));
+});
+
 /* Public Nikah Nama application – waiting until admin approves */
 app.post("/api/public/marriages", (req, res) => {
   const store = readStore();
+  const form = mergeNikahForm(store.nikahForm);
   const marriage = buildMarriage(
     { ...req.body, source: "public" },
     null,
     { forcePending: true }
   );
-  if (!marriage.applicantName || !marriage.applicantMobile || !marriage.applicantEmail) {
+  marriage.extraFields = sanitizeExtraFields(req.body?.extraFields, form);
+  const missing = missingRequiredFields(marriage, form);
+  if (missing.length) {
     return res.status(400).json({
-      error: "Applicant name, mobile and email are required",
+      error: `Required: ${missing.join(", ")}`,
     });
   }
-  if (!marriage.groomFirstName || !marriage.brideFirstName) {
-    return res.status(400).json({ error: "Groom and bride first names are required" });
+  const signatures = req.body?.signatures && typeof req.body.signatures === "object"
+    ? req.body.signatures
+    : {};
+  for (const role of SIGN_ROLES) {
+    if (role.key === "certifier") continue;
+    const image = signatures[role.key];
+    if (!image) continue;
+    const saved = applySignatureUpload(marriage, role.key, image);
+    if (saved.error) return res.status(400).json({ error: saved.error });
   }
-  if (!marriage.groomLastName || !marriage.brideLastName) {
-    return res.status(400).json({ error: "Groom and bride last names are required" });
-  }
+  if (!marriage.certificateNo) marriage.certificateNo = issueCertificateNo(store);
   store.marriages.unshift(marriage);
   writeStore(store);
   res.json({
@@ -1067,7 +1311,45 @@ app.post("/api/public/marriages", (req, res) => {
     certificateNo: marriage.certificateNo,
     status: "pending",
     trackUrl: `/track-nikah.html?c=${encodeURIComponent(marriage.certificateNo)}`,
-    message: "Submitted. Waiting for admin approval.",
+    message: "Submitted. Waiting for admin approval. Signatures appear on the certificate only after admin approval.",
+  });
+});
+
+app.get("/api/public/sign/:token", (req, res) => {
+  const found = findMarriageBySignToken(readStore(), req.params.token);
+  if (!found) return res.status(404).json({ error: "Signature link not found" });
+  const roles = SIGN_ROLES.filter((role) => {
+    if (!found.role && role.key === "certifier") return false;
+    return !found.role || role.key === found.role;
+  }).map((role) => signaturePublicView(found.marriage.signatures?.[role.key], role));
+  res.json({
+    certificateNo: found.marriage.certificateNo,
+    groomName: found.marriage.groomName,
+    brideName: found.marriage.brideName,
+    shared: !found.role,
+    roles,
+  });
+});
+
+app.post("/api/public/sign/:token", (req, res) => {
+  const store = readStore();
+  const found = findMarriageBySignToken(store, req.params.token);
+  if (!found) return res.status(404).json({ error: "Signature link not found" });
+  const role = found.role || String(req.body?.role || "");
+  if (role === "certifier") {
+    return res.status(403).json({ error: "Certifier signature is added by the office" });
+  }
+  if (found.role && role !== found.role) {
+    return res.status(403).json({ error: "This link is for one signature only" });
+  }
+  const saved = applySignatureUpload(found.marriage, role, req.body?.image);
+  if (saved.error) return res.status(400).json({ error: saved.error });
+  const idx = store.marriages.findIndex((item) => item.id === found.marriage.id);
+  store.marriages[idx] = found.marriage;
+  writeStore(store);
+  res.json({
+    ok: true,
+    message: "Signature submitted. It will be added to the certificate after admin approval.",
   });
 });
 
@@ -1147,6 +1429,123 @@ app.get("/api/public/marriages/:id/pdf", async (req, res) => {
 
 app.get("/api/public/marriages/:id/certificate", (req, res) => {
   return res.status(403).json({ error: "Use track page status + PIN download" });
+});
+
+app.post("/api/marriages/:id/signatures/:role/approve", requirePerm("marriage", "approve"), (req, res) => {
+  const store = readStore();
+  const idx = store.marriages.findIndex((item) => item.id === req.params.id);
+  if (idx < 0) return res.status(404).json({ error: "Not found" });
+  const marriage = ensureSignatureSlots(store.marriages[idx]);
+  const slot = marriage.signatures[req.params.role];
+  if (!slot) return res.status(404).json({ error: "Unknown signature" });
+  if (slot.status !== "pending" || !slot.file) {
+    return res.status(400).json({ error: "No submitted signature to approve" });
+  }
+  slot.status = "approved";
+  slot.allowEdit = false;
+  slot.approvedAt = new Date().toISOString();
+  store.marriages[idx] = marriage;
+  writeStore(store);
+  res.json({ ok: true, signature: signaturePublicView(slot, SIGN_ROLES.find((role) => role.key === req.params.role)) });
+});
+
+app.post("/api/marriages/:id/signatures/:role/upload", requirePerm("marriage", "update"), (req, res) => {
+  const store = readStore();
+  const idx = store.marriages.findIndex((item) => item.id === req.params.id);
+  if (idx < 0) return res.status(404).json({ error: "Not found" });
+  if (req.params.role === "certifier") {
+    return res.status(400).json({ error: "Choose a saved certifier when you approve" });
+  }
+  const known = SIGN_ROLES.some((role) => role.key === req.params.role);
+  if (!known) return res.status(404).json({ error: "Unknown signature" });
+  const bytes = decodeSignaturePng(req.body?.image);
+  if (!bytes) return res.status(400).json({ error: "Draw or upload a signature first" });
+  const marriage = ensureSignatureSlots(store.marriages[idx]);
+  const slot = marriage.signatures[req.params.role];
+  slot.file = saveSignatureFile(marriage.id, req.params.role, bytes);
+  slot.status = "pending";
+  slot.allowEdit = false;
+  slot.submittedAt = new Date().toISOString();
+  slot.approvedAt = null;
+  store.marriages[idx] = marriage;
+  writeStore(store);
+  res.json({ ok: true, message: "Signature uploaded. Approve it to place it on the certificate." });
+});
+
+app.post("/api/marriages/:id/signatures/:role/allow-edit", requirePerm("marriage", "update"), (req, res) => {
+  const store = readStore();
+  const idx = store.marriages.findIndex((item) => item.id === req.params.id);
+  if (idx < 0) return res.status(404).json({ error: "Not found" });
+  const marriage = ensureSignatureSlots(store.marriages[idx]);
+  const slot = marriage.signatures[req.params.role];
+  if (!slot) return res.status(404).json({ error: "Unknown signature" });
+  slot.allowEdit = true;
+  store.marriages[idx] = marriage;
+  writeStore(store);
+  res.json({ ok: true });
+});
+
+app.get("/api/marriages/:id/signatures/:role/image", requirePerm("marriage", "view"), (req, res) => {
+  const marriage = readStore().marriages.find((item) => item.id === req.params.id);
+  const file = marriage?.signatures?.[req.params.role]?.file;
+  if (!file || !fs.existsSync(file)) return res.status(404).json({ error: "No signature image" });
+  res.sendFile(file);
+});
+
+app.post("/api/marriages/:id/send-signature-links", requirePerm("marriage", "update"), async (req, res) => {
+  const store = readStore();
+  const idx = store.marriages.findIndex((item) => item.id === req.params.id);
+  if (idx < 0) return res.status(404).json({ error: "Not found" });
+  const marriage = ensureSignatureSlots(store.marriages[idx]);
+  const mode = req.body?.mode === "one" ? "one" : "each";
+  const channel = String(req.body?.channel || "sms").toLowerCase() === "email" ? "email" : "sms";
+  const base = publicBaseUrl(req);
+  const sent = [];
+
+  try {
+    if (mode === "one") {
+      const to = channel === "email" ? String(req.body?.email || "").trim() : String(req.body?.mobile || "").trim();
+      if (!to) return res.status(400).json({ error: channel === "email" ? "Email required" : "Mobile number required" });
+      const link = `${base}/sign-nikah.html?t=${encodeURIComponent(marriage.signBundleToken)}`;
+      const message =
+        `Khadijatul Kubra Trust: sign Nikah Nama ${marriage.certificateNo}. ` +
+        `Open this link and choose your signature: ${link}`;
+      if (channel === "email") {
+        await sendEmail(to, `Nikah signature · ${marriage.certificateNo}`, message);
+      } else {
+        await sendSms(to, message);
+      }
+      sent.push({ mode: "one", to });
+    } else {
+      const recipients = Array.isArray(req.body?.recipients) ? req.body.recipients : [];
+      for (const role of SIGN_ROLES) {
+        if (role.key === "certifier") continue;
+        const row = recipients.find((item) => item.role === role.key) || {};
+        const to = channel === "email" ? String(row.email || "").trim() : String(row.mobile || "").trim();
+        if (!to) continue;
+        const link = `${base}/sign-nikah.html?t=${encodeURIComponent(marriage.signatures[role.key].token)}`;
+        const message =
+          `Khadijatul Kubra Trust: ${role.label} signature for Nikah Nama ${marriage.certificateNo}. ${link}`;
+        if (channel === "email") {
+          await sendEmail(to, `${role.label} signature · ${marriage.certificateNo}`, message);
+        } else {
+          await sendSms(to, message);
+        }
+        sent.push({ role: role.key, to });
+      }
+      if (!sent.length) {
+        return res.status(400).json({ error: "Enter at least one mobile or email" });
+      }
+    }
+  } catch (err) {
+    console.error("Signature link send error:", err);
+    return res.status(502).json({ error: err.message || "Could not send signature link" });
+  }
+
+  marriage.signatureLinksSentAt = new Date().toISOString();
+  store.marriages[idx] = marriage;
+  writeStore(store);
+  res.json({ ok: true, sent, message: "Signature link sent" });
 });
 
 app.post("/api/marriages/:id/send-pin", requirePerm("marriage", "approve"), async (req, res) => {
@@ -1235,13 +1634,80 @@ app.post("/api/marriages/:id/send-pin", requirePerm("marriage", "approve"), asyn
   }
 });
 
+function applySavedCertifier(marriage, store, certifierId) {
+  const saved = (store.certifierSigns || []).find((item) => item.id === certifierId);
+  if (!saved || !saved.file || !fs.existsSync(saved.file)) {
+    return { error: "Saved certifier signature not found" };
+  }
+  ensureSignatureSlots(marriage);
+  const dest = path.join(SIGNATURE_DIR, `${marriage.id}-certifier.png`);
+  fs.copyFileSync(saved.file, dest);
+  const slot = marriage.signatures.certifier;
+  slot.file = dest;
+  slot.status = "approved";
+  slot.allowEdit = false;
+  slot.submittedAt = slot.submittedAt || new Date().toISOString();
+  slot.approvedAt = new Date().toISOString();
+  marriage.certifierName = saved.name;
+  return { ok: true };
+}
+
+function certifierSignView(item) {
+  return { id: item.id, name: item.name };
+}
+
+app.get("/api/certifier-signs", requirePerm("marriage", "view"), (req, res) => {
+  res.json((readStore().certifierSigns || []).map(certifierSignView));
+});
+
+app.get("/api/certifier-signs/:id/image", requirePerm("marriage", "view"), (req, res) => {
+  const item = (readStore().certifierSigns || []).find((sign) => sign.id === req.params.id);
+  if (!item?.file || !fs.existsSync(item.file)) return res.status(404).json({ error: "No signature" });
+  res.sendFile(item.file);
+});
+
+app.post("/api/certifier-signs", requirePerm("marriage", "update"), (req, res) => {
+  const name = cleanLabel(req.body?.name);
+  if (!name) return res.status(400).json({ error: "Name required" });
+  const bytes = decodeSignaturePng(req.body?.image);
+  if (!bytes) return res.status(400).json({ error: "Draw or upload a signature first" });
+  const store = readStore();
+  const id = uuidv4();
+  const file = path.join(SIGNATURE_DIR, `certifier-${id}.png`);
+  fs.writeFileSync(file, bytes);
+  const item = { id, name, file, createdAt: new Date().toISOString() };
+  store.certifierSigns = [...(store.certifierSigns || []), item];
+  writeStore(store);
+  res.json(certifierSignView(item));
+});
+
+app.delete("/api/certifier-signs/:id", requirePerm("marriage", "update"), (req, res) => {
+  const store = readStore();
+  const item = (store.certifierSigns || []).find((sign) => sign.id === req.params.id);
+  if (!item) return res.status(404).json({ error: "Not found" });
+  if (item.file && fs.existsSync(item.file)) fs.unlinkSync(item.file);
+  store.certifierSigns = store.certifierSigns.filter((sign) => sign.id !== item.id);
+  writeStore(store);
+  res.json({ ok: true });
+});
+
 app.get("/api/marriages", requirePerm("marriage", "view"), (req, res) => {
   res.json(readStore().marriages);
 });
 
 app.get("/api/marriages/:id", requirePerm("marriage", "view"), (req, res) => {
-  const marriage = readStore().marriages.find((m) => m.id === req.params.id);
-  if (!marriage) return res.status(404).json({ error: "Not found" });
+  const store = readStore();
+  const idx = store.marriages.findIndex((item) => item.id === req.params.id);
+  if (idx < 0) return res.status(404).json({ error: "Not found" });
+  const current = store.marriages[idx];
+  const hadLinks =
+    current.signBundleToken &&
+    SIGN_ROLES.every((role) => current.signatures?.[role.key]?.token);
+  const marriage = ensureSignatureSlots(current);
+  if (!hadLinks) {
+    store.marriages[idx] = marriage;
+    writeStore(store);
+  }
   res.json(marriage);
 });
 
@@ -1253,6 +1719,7 @@ app.post("/api/marriages", requirePerm("marriage", "create"), (req, res) => {
     delete body.downloadPin;
   }
   const marriage = buildMarriage(body, null, { allowStatus: true });
+  if (!marriage.certificateNo) marriage.certificateNo = issueCertificateNo(store);
   store.marriages.unshift(marriage);
   writeStore(store);
   res.json(marriage);
@@ -1280,7 +1747,22 @@ app.put("/api/marriages/:id", requireAny([["marriage", "update"], ["marriage", "
       downloadPin: body.downloadPin != null ? body.downloadPin : existing.downloadPin,
     };
   }
-  store.marriages[idx] = buildMarriage(body, existing, { allowStatus: true });
+  const saved = buildMarriage(body, existing, { allowStatus: true });
+  if (body.extraFields && canDo(user, "marriage", "update")) {
+    saved.extraFields = sanitizeExtraFields(
+      body.extraFields,
+      mergeNikahForm(store.nikahForm)
+    );
+  }
+  const duplicate = store.marriages.some(
+    (item) => item.id !== saved.id && item.certificateNo && item.certificateNo === saved.certificateNo
+  );
+  if (duplicate) return res.status(400).json({ error: "That certificate number is already used" });
+  if (body.certifierSignId && canDo(user, "marriage", "approve")) {
+    const applied = applySavedCertifier(saved, store, String(body.certifierSignId));
+    if (applied.error) return res.status(400).json({ error: applied.error });
+  }
+  store.marriages[idx] = saved;
   writeStore(store);
   res.json(store.marriages[idx]);
 });
@@ -1405,6 +1887,290 @@ app.use("/portal", express.static(path.join(ROOT, "portal")));
 app.get("/portal", (req, res) => {
   if (req.session.user) return res.redirect("/portal/index.html");
   return res.redirect("/portal/login.html");
+});
+
+function cleanCategoryName(value) {
+  const text = String(value || "").trim().replace(/\s+/g, " ").slice(0, 40);
+  if (!/^[A-Za-z][A-Za-z0-9 _-]{0,39}$/.test(text)) return "";
+  return text;
+}
+
+function formPdfPath(id) {
+  return path.join(FORM_DIR, `${id}.pdf`);
+}
+
+function publicFormTemplate(template) {
+  return {
+    id: template.id,
+    name: template.name,
+    category: template.category,
+    active: Boolean(template.active),
+    fields: template.fields || [],
+    hasPdf: fs.existsSync(formPdfPath(template.id)),
+    updatedAt: template.updatedAt || null,
+  };
+}
+
+function assertFormFill(req, res, category) {
+  const user = loadSessionUser(req);
+  if (!user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return false;
+  }
+  const key = categoryKey(category);
+  const moduleKey = key === "student" || key === "students" ? "students" : key === "marriage" || key === "marriages" ? "marriage" : "users";
+  const action = moduleKey === "users" ? "manage" : "view";
+  if (!canDo(user, moduleKey, action) && !canDo(user, "users", "manage")) {
+    res.status(403).json({ error: "You do not have permission for this action" });
+    return false;
+  }
+  return true;
+}
+
+app.get("/api/form-templates", requirePerm("users", "manage"), (req, res) => {
+  const store = readStore();
+  const templates = store.formTemplates || [];
+  res.json({
+    templates: templates.map(publicFormTemplate),
+    fonts: publicFontList(store),
+    categories: {
+      Marriage: [
+        { key: "certificateNo", label: "Certificate number" },
+        { key: "groomName", label: "Groom full name" },
+        { key: "brideName", label: "Bride full name" },
+        { key: "groomDob", label: "Groom date of birth" },
+        { key: "brideDob", label: "Bride date of birth" },
+        { key: "marriageDate", label: "Marriage date" },
+        ...mergeNikahForm(store.nikahForm).fields.map((field) => ({ key: field.key, label: field.label })),
+      ],
+      Student: fieldsForCategory("student").map(([key, label]) => ({ key, label })),
+    },
+  });
+});
+
+app.post("/api/form-templates", requirePerm("users", "manage"), (req, res) => {
+  const name = String(req.body.name || "").trim().slice(0, 80);
+  const category = cleanCategoryName(req.body.category);
+  if (!name) return res.status(400).json({ error: "Form name is required" });
+  if (!category) return res.status(400).json({ error: "Category must start with a letter" });
+  const store = readStore();
+  store.formTemplates = store.formTemplates || [];
+  const template = {
+    id: uuidv4(),
+    name,
+    category,
+    active: req.body.active !== false,
+    fields: cleanFields(req.body.fields, customFamilies(store)),
+    updatedAt: new Date().toISOString(),
+  };
+  if (template.active) {
+    const key = categoryKey(category);
+    for (const item of store.formTemplates) {
+      if (categoryKey(item.category) === key) item.active = false;
+    }
+  }
+  store.formTemplates.unshift(template);
+  writeStore(store);
+  res.json(publicFormTemplate(template));
+});
+
+app.put("/api/form-templates/:id", requirePerm("users", "manage"), (req, res) => {
+  const store = readStore();
+  const templates = store.formTemplates || [];
+  const template = templates.find((item) => item.id === req.params.id);
+  if (!template) return res.status(404).json({ error: "Form not found" });
+  const name = String(req.body.name || template.name || "").trim().slice(0, 80);
+  const category = cleanCategoryName(req.body.category || template.category);
+  if (!name || !category) return res.status(400).json({ error: "Name and category are required" });
+  template.name = name;
+  template.category = category;
+  template.fields = cleanFields(req.body.fields, customFamilies(store));
+  template.active = Boolean(req.body.active);
+  template.updatedAt = new Date().toISOString();
+  if (template.active) {
+    const key = categoryKey(category);
+    for (const item of templates) {
+      if (item.id !== template.id && categoryKey(item.category) === key) item.active = false;
+    }
+  }
+  writeStore(store);
+  res.json(publicFormTemplate(template));
+});
+
+app.put(
+  "/api/form-templates/:id/file",
+  requirePerm("users", "manage"),
+  express.raw({ type: "application/pdf", limit: "30mb" }),
+  (req, res) => {
+    const store = readStore();
+    const template = (store.formTemplates || []).find((item) => item.id === req.params.id);
+    if (!template) return res.status(404).json({ error: "Form not found" });
+    if (!Buffer.isBuffer(req.body) || req.body.length < 5 || req.body.slice(0, 4).toString() !== "%PDF") {
+      return res.status(400).json({ error: "Upload a PDF file" });
+    }
+    fs.writeFileSync(formPdfPath(template.id), req.body);
+    template.updatedAt = new Date().toISOString();
+    writeStore(store);
+    res.json({ ok: true, hasPdf: true });
+  }
+);
+
+app.get("/api/form-templates/:id/file", requirePerm("users", "manage"), (req, res) => {
+  const store = readStore();
+  const template = (store.formTemplates || []).find((item) => item.id === req.params.id);
+  const file = formPdfPath(req.params.id);
+  if (!template || !fs.existsSync(file)) return res.status(404).json({ error: "PDF not found" });
+  res.setHeader("Content-Type", "application/pdf");
+  res.send(fs.readFileSync(file));
+});
+
+app.delete("/api/form-templates/:id", requirePerm("users", "manage"), (req, res) => {
+  const store = readStore();
+  store.formTemplates = (store.formTemplates || []).filter((item) => item.id !== req.params.id);
+  writeStore(store);
+  const file = formPdfPath(req.params.id);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
+  res.json({ ok: true });
+});
+
+app.get("/api/form-templates/records", (req, res) => {
+  const category = cleanCategoryName(req.query.category);
+  if (!category) return res.status(400).json({ error: "Category is required" });
+  if (!assertFormFill(req, res, category)) return;
+  const records = sourceList(readStore(), category);
+  if (!records) return res.json([]);
+  res.json(records.slice(0, 100).map((record) => ({ id: record.id, label: recordLabel(record, category) })));
+});
+
+app.get("/api/form-fill/:category/:recordId", async (req, res) => {
+  const category = cleanCategoryName(req.params.category);
+  if (!category) return res.status(400).json({ error: "Category is required" });
+  if (!assertFormFill(req, res, category)) return;
+  try {
+    const pdf = await buildFilledForm(category, req.params.recordId, {});
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${categoryKey(category)}-form.pdf"`);
+    res.send(pdf);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || "Could not fill the PDF" });
+  }
+});
+
+app.post("/api/form-templates/:id/fill", async (req, res) => {
+  const store = readStore();
+  const template = (store.formTemplates || []).find((item) => item.id === req.params.id);
+  if (!template) return res.status(404).json({ error: "Form not found" });
+  if (!assertFormFill(req, res, template.category)) return;
+  try {
+    const pdf = await buildFilledForm(template.category, req.body.recordId, req.body.data || {}, template.id);
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${categoryKey(template.category)}-form.pdf"`);
+    res.send(pdf);
+  } catch (err) {
+    res.status(err.status || 500).json({ error: err.message || "Could not fill the PDF" });
+  }
+});
+
+async function buildFilledForm(category, recordId, overrides, templateId) {
+  const store = readStore();
+  const templates = store.formTemplates || [];
+  const template = templateId
+    ? templates.find((item) => item.id === templateId)
+    : templates.find((item) => item.active && categoryKey(item.category) === categoryKey(category));
+  if (!template) {
+    const error = new Error("No active form for this category. Set one in Settings → Form Builder.");
+    error.status = 404;
+    throw error;
+  }
+  const file = formPdfPath(template.id);
+  if (!fs.existsSync(file)) {
+    const error = new Error("This form has no PDF yet");
+    error.status = 400;
+    throw error;
+  }
+  const records = sourceList(store, template.category) || [];
+  const record = records.find((item) => item.id === recordId) || null;
+  if (records.length && recordId && !record) {
+    const error = new Error("Record not found");
+    error.status = 404;
+    throw error;
+  }
+  const values = {};
+  for (const field of template.fields || []) {
+    values[field.key] = record ? valueOf(record, field.key, template.category) : "";
+  }
+  if (overrides && typeof overrides === "object") {
+    for (const [key, value] of Object.entries(overrides)) {
+      const cleanKey = String(key).replace(/[^A-Za-z0-9_]/g, "").slice(0, 40);
+      if (!cleanKey || !String(value ?? "").trim()) continue;
+      values[cleanKey] = String(value).slice(0, 500);
+    }
+  }
+  const images = {};
+  if (record && (categoryKey(template.category) === "marriage" || categoryKey(template.category) === "marriages")) {
+    const roles = {
+      signGroom: "groom",
+      signBride: "bride",
+      signWitness1: "witness1",
+      signWitness2: "witness2",
+      signCertifier: "certifier",
+    };
+    for (const [key, role] of Object.entries(roles)) {
+      const slot = record.signatures?.[role];
+      const file = path.join(SIGNATURE_DIR, `${record.id}-${role}.png`);
+      if (slot?.status === "approved" && fs.existsSync(file)) images[key] = fs.readFileSync(file);
+    }
+  }
+  return fillTemplatePdf(fs.readFileSync(file), template.fields || [], values, images, {
+    families: customFamilies(store),
+    readFont: (fontName) => readFormFontBytes(store, fontName, FONT_DIR),
+  });
+}
+
+app.post(
+  "/api/form-fonts",
+  requirePerm("users", "manage"),
+  express.raw({ type: () => true, limit: "8mb" }),
+  (req, res) => {
+    let rawName = "";
+    try {
+      rawName = decodeURIComponent(String(req.get("x-font-name") || ""));
+    } catch (_) {
+      rawName = "";
+    }
+    const family = cleanFontFamily(rawName);
+    if (!family) return res.status(400).json({ error: "Font name must start with a letter" });
+    if (isReservedFamily(family)) return res.status(400).json({ error: "That font name is already built in" });
+    if (!isFontBytes(req.body)) return res.status(400).json({ error: "Upload a TTF or OTF font" });
+    const ext = /\.otf$/i.test(String(req.get("x-font-name") || "")) ? "otf" : "ttf";
+    const store = readStore();
+    store.formFonts = store.formFonts || [];
+    let font = store.formFonts.find((item) => item.family.toLowerCase() === family.toLowerCase());
+    if (!font) {
+      font = { id: uuidv4(), family, file: "", ext };
+      store.formFonts.push(font);
+    } else if (font.file && font.file !== `${font.id}.${ext}`) {
+      const previous = path.join(FONT_DIR, font.file);
+      if (fs.existsSync(previous)) fs.unlinkSync(previous);
+    }
+    font.family = family;
+    font.ext = ext;
+    font.file = `${font.id}.${ext}`;
+    fs.writeFileSync(path.join(FONT_DIR, font.file), req.body);
+    writeStore(store);
+    res.json({ id: font.id, family: font.family, uploaded: true });
+  }
+);
+
+app.get("/api/form-fonts/:id/file", requirePerm("users", "manage"), (req, res) => {
+  const store = readStore();
+  const font = (store.formFonts || []).find((item) => item.id === req.params.id);
+  if (!font) return res.status(404).json({ error: "Font not found" });
+  const file = path.join(FONT_DIR, font.file);
+  if (!fs.existsSync(file)) return res.status(404).json({ error: "Font file not found" });
+  res.setHeader("Content-Type", font.ext === "otf" ? "font/otf" : "font/ttf");
+  res.setHeader("Cache-Control", "private, max-age=3600");
+  res.send(fs.readFileSync(file));
 });
 
 app.use(express.static(ROOT, { index: "index.html" }));

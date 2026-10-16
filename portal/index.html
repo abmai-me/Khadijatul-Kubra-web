@@ -241,7 +241,12 @@
             <h2>Marriage / Nikah Nama</h2>
             <p>Public applications, edit/correction, approval &amp; download</p>
           </div>
-          <a class="btn btn-secondary" href="/nikah-nama.html" target="_blank"><i class="fa-solid fa-up-right-from-square"></i> Public Form</a>
+          <div class="topbar-actions">
+            <button class="btn btn-secondary" type="button" id="nikahFieldsBtn"><i class="fa-solid fa-list-check"></i> Form Fields</button>
+            <button class="btn btn-secondary" type="button" id="certPrefixBtn"><i class="fa-solid fa-hashtag"></i> Certificate No</button>
+            <button class="btn btn-secondary" type="button" id="certifierSignsBtn"><i class="fa-solid fa-signature"></i> Certifier Signs</button>
+            <a class="btn btn-secondary" href="/nikah-nama.html" target="_blank"><i class="fa-solid fa-up-right-from-square"></i> Public Form</a>
+          </div>
         </div>
         <div class="card no-print">
           <div class="panel-head">
@@ -254,7 +259,7 @@
             <div class="form-section">
               <h4 class="form-section-title">1. Certificate &amp; Status</h4>
               <div class="form-grid">
-                <div class="form-group"><label>Certificate No</label><input id="certificateNo" placeholder="Auto"></div>
+                <div class="form-group"><label>Certificate No</label><input id="certificateNo" maxlength="40" placeholder="Leave blank to generate, or type a number"></div>
                 <div class="form-group"><label>Status</label>
                   <select id="marriageStatus">
                     <option value="pending">Waiting</option>
@@ -347,6 +352,11 @@
               </div>
             </div>
 
+            <div class="form-section hidden" id="marriageExtraSection">
+              <h4 class="form-section-title">Extra online fields</h4>
+              <div class="form-grid" id="marriageExtraFields"></div>
+            </div>
+
             <div class="form-section">
               <h4 class="form-section-title">8. Admin Notes</h4>
               <div class="form-grid">
@@ -359,6 +369,90 @@
               </div>
             </div>
           </form>
+
+          <div id="certPrefixModal" class="modal-overlay hidden">
+            <div class="modal-card" style="max-width:640px">
+              <div class="panel-head">
+                <h3>Certificate number</h3>
+                <button type="button" class="btn btn-secondary btn-sm" id="closeCertPrefix">Close</button>
+              </div>
+              <p class="muted" style="margin:0 0 12px">This becomes the standard number for every new application.</p>
+              <div class="form-grid">
+                <div class="form-group"><label>Prefix</label><input id="certificatePrefix" maxlength="24" placeholder="KKT"></div>
+                <div class="form-group"><label>Middle (auto)</label><input id="certificateMiddle" readonly></div>
+                <div class="form-group"><label>Year</label><input id="certificateYear" maxlength="4" inputmode="numeric"></div>
+                <div class="form-group"><label>Next number looks like</label><input id="certificatePreview" readonly></div>
+              </div>
+              <p class="muted">Prefix, automatic middle number, then the year you edit. The middle cannot be typed. Example: KKT-0001-2026</p>
+              <div class="actions" style="margin-top:14px">
+                <button type="button" class="btn btn-primary" id="saveCertPrefixBtn">Save standard number</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="nikahFieldsModal" class="modal-overlay hidden">
+            <div class="modal-card" style="max-width:760px">
+              <div class="panel-head">
+                <h3>Online form fields</h3>
+                <button type="button" class="btn btn-secondary btn-sm" id="closeNikahFields">Close</button>
+              </div>
+              <p class="muted" style="margin:0 0 12px">Turn a field On when the public form must have it. Off means it can be left blank.</p>
+              <div id="nikahFieldsBody"></div>
+              <div class="actions" style="margin-top:14px">
+                <button type="button" class="btn btn-secondary" id="addNikahFieldBtn">Add field</button>
+                <button type="button" class="btn btn-primary" id="saveNikahFieldsBtn">Save fields</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="signatureModal" class="modal-overlay hidden">
+            <div class="modal-card" style="max-width:760px">
+              <div class="panel-head">
+                <h3 id="signatureModalTitle">Signatures</h3>
+                <button type="button" class="btn btn-secondary btn-sm" id="closeSignatureModal">Close</button>
+              </div>
+              <div id="signatureModalBody"></div>
+            </div>
+          </div>
+
+          <div id="certifierSignsModal" class="modal-overlay hidden">
+            <div class="modal-card" style="max-width:680px">
+              <div class="panel-head">
+                <h3>Saved certifier signatures</h3>
+                <button type="button" class="btn btn-secondary btn-sm" id="closeCertifierSigns">Close</button>
+              </div>
+              <p class="muted" style="margin:0 0 12px">Save a name and signature here. When you approve an application, pick that name and this signature is placed on the certificate.</p>
+              <div id="certifierSignsList"></div>
+              <div class="form-section">
+                <h4 class="form-section-title">Add certifier</h4>
+                <div class="form-grid">
+                  <div class="form-group full"><label>Name</label><input id="newCertifierName" placeholder="Certifier name"></div>
+                  <div class="form-group full">
+                    <label>Signature</label>
+                    <canvas id="certifierPad" width="640" height="160" style="width:100%;height:90px;border:1px dashed #b7cfc2;border-radius:10px;background:#fff;touch-action:none"></canvas>
+                    <div class="actions" style="margin-top:8px">
+                      <button type="button" class="btn btn-secondary btn-sm" id="clearCertifierPad">Clear</button>
+                      <label class="btn btn-secondary btn-sm">Upload<input id="certifierFile" type="file" accept="image/png,image/jpeg" hidden></label>
+                      <button type="button" class="btn btn-primary btn-sm" id="saveCertifierSign">Save signature</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="pdfPreviewModal" class="modal-overlay hidden">
+            <div class="modal-card pdf-preview-card">
+              <div class="panel-head">
+                <h3>Certificate preview</h3>
+                <div class="actions">
+                  <a class="btn btn-gold btn-sm" id="pdfPreviewDownload" href="#">Download</a>
+                  <button type="button" class="btn btn-secondary btn-sm" id="closePdfPreview">Close</button>
+                </div>
+              </div>
+              <div id="pdfPreviewPages" class="pdf-preview-pages"></div>
+            </div>
+          </div>
 
           <div id="marriageViewModal" class="modal-overlay hidden">
             <div class="modal-card">
@@ -379,8 +473,14 @@
               <p class="muted" style="margin:0 0 12px">Set a download PIN. Applicant will use this PIN on the track page to download the PDF.</p>
               <input type="hidden" id="approveMarriageId">
               <div class="form-grid">
-                <div class="form-group full">
-                  <label>Download PIN</label>
+              <div class="form-group full">
+                <label>Certifier</label>
+                <select id="approveCertifier">
+                  <option value="">No certifier signature</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label>Download PIN</label>
                   <input id="approveDownloadPin" inputmode="numeric" maxlength="8" placeholder="e.g. 482915">
                 </div>
               </div>
@@ -422,9 +522,9 @@
             </div>
           </div>
           <div class="table-wrap">
-            <table>
+            <table class="marriage-table">
               <thead>
-                <tr><th>Certificate</th><th>Groom</th><th>Bride</th><th>Date</th><th>Source</th><th>Status</th><th>Actions</th></tr>
+                <tr><th>Certificate</th><th>Groom</th><th>Bride</th><th>Marriage date</th><th>Application date</th><th>Source</th><th>Status</th><th>Actions</th></tr>
               </thead>
               <tbody id="marriagesTable"></tbody>
             </table>
@@ -537,6 +637,11 @@
               <i class="fa-solid fa-user-shield"></i>
               <span>User Access</span>
               <small>Role · Permissions</small>
+            </button>
+            <button type="button" class="settings-nav-btn" data-settings-panel="forms">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Form Builder</span>
+              <small>PDF · Fields · Category</small>
             </button>
           </aside>
 
@@ -710,6 +815,79 @@
                 </div>
               </div>
             </div>
+
+            <div class="settings-panel" id="settings-panel-forms">
+              <div id="formBuilderError" class="alert alert-error hidden"></div>
+              <div class="card settings-card">
+                <div class="panel-head">
+                  <div>
+                    <h3>Form Builder</h3>
+                    <p class="muted">Upload any PDF, place fields, and connect it to a category. Download then fills that category’s data.</p>
+                  </div>
+                  <button class="btn btn-primary" type="button" id="newFormTemplateBtn"><i class="fa-solid fa-plus"></i> New form</button>
+                </div>
+                <div id="formTemplateList" class="form-template-list"></div>
+              </div>
+
+              <div class="card settings-card hidden" id="formBuilderEditor">
+                <div class="word-toolbar">
+                  <input id="formTemplateName" class="theme-field" placeholder="Form name" aria-label="Form name">
+                  <input id="formTemplateCategory" class="theme-field" list="formCategoryList" placeholder="Category" aria-label="Category">
+                  <datalist id="formCategoryList">
+                    <option value="Marriage"></option>
+                    <option value="Student"></option>
+                  </datalist>
+                  <label class="icon-btn" title="Upload PDF">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    <input id="formTemplateFile" type="file" accept="application/pdf,.pdf" hidden>
+                  </label>
+                  <span id="formFileName" class="file-name">No PDF</span>
+                  <label class="page-label">Page <select id="formBuilderPage" class="theme-field"></select></label>
+                  <div class="zoom-tools">
+                    <button type="button" class="icon-btn" id="formZoomOut" title="Zoom out"><i class="fa-solid fa-minus"></i></button>
+                    <span id="formZoomLabel">100%</span>
+                    <button type="button" class="icon-btn" id="formZoomIn" title="Zoom in"><i class="fa-solid fa-plus"></i></button>
+                    <button type="button" class="icon-btn" id="formEyedropBtn" title="Match size and text"><i class="fa-solid fa-eye-dropper"></i></button>
+                    <label class="icon-btn" title="Add a font (TTF or OTF)">
+                      <i class="fa-solid fa-font"></i>
+                      <input id="formFontFile" type="file" accept=".ttf,.otf,font/ttf,font/otf" hidden>
+                    </label>
+                  </div>
+                  <div id="formFontList" class="font-picks" aria-label="Font"></div>
+                  <div id="formSelectionBar" class="word-selection hidden">
+                    <button type="button" class="style-btn text-tool" id="formStyleRegular" title="Regular">R</button>
+                    <button type="button" class="style-btn text-tool" id="formStyleBold" title="Bold"><b>B</b></button>
+                    <button type="button" class="style-btn text-tool" id="formStyleItalic" title="Italic"><i>I</i></button>
+                    <input id="formSize" class="theme-field text-tool size-field" type="number" min="6" max="48" aria-label="Font size">
+                    <input id="formColor" class="text-tool color-field" type="color" aria-label="Colour" value="#143826">
+                    <select id="formAlign" class="theme-field align-tool" aria-label="Align">
+                      <option value="left">Left</option>
+                      <option value="center">Center</option>
+                      <option value="right">Right</option>
+                    </select>
+                    <button type="button" class="btn btn-danger btn-sm" id="formDeleteField">Remove</button>
+                  </div>
+                  <span class="word-toolbar-spacer"></span>
+                  <button type="button" class="icon-btn" id="formExpandBtn" title="Big screen"><i class="fa-solid fa-expand"></i></button>
+                  <button class="btn btn-primary btn-sm" type="button" id="saveFormTemplateBtn">Save</button>
+                  <button class="btn btn-secondary btn-sm" type="button" id="closeFormBuilder">Close</button>
+                </div>
+                <p class="muted word-hint" id="formBuilderTitle">Drag an attribute onto the page. Move it freely, and pull the corner to make it bigger or smaller. Saving under Marriage uses this form for every marriage record.</p>
+                <div class="word-desk">
+                  <aside class="attr-pane">
+                    <input id="formAttrSearch" placeholder="Search attributes" aria-label="Search attributes">
+                    <div id="formAttrList"></div>
+                  </aside>
+                    <div id="formBuilderStage" class="form-builder-stage">
+                      <p class="muted" id="formBuilderEmpty">Upload a PDF, then drag attributes onto it.</p>
+                      <div id="formBuilderSheet" class="form-builder-sheet">
+                        <canvas id="formBuilderCanvas"></canvas>
+                        <div id="formBuilderOverlay" class="form-builder-overlay"></div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -760,7 +938,10 @@
     </div>
   </div>
 
+  <script src="/assets/js/signature-clean.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="js/portal.js"></script>
   <script src="js/builder.js"></script>
+  <script src="js/form-builder.js"></script>
 </body>
 </html>

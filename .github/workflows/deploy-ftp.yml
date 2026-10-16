@@ -1,0 +1,36 @@
+# Optional: auto-upload to cPanel/FTP when you push to main.
+# Add these GitHub Secrets (Settings → Secrets → Actions):
+#   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD
+# Then rename this file's workflow to run (remove the if: false below).
+
+name: Deploy to hosting (FTP)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  ftp-deploy:
+    if: ${{ false }} # set to true after adding FTP secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.env
+            **/tmp-nikah/**
+            **/.deploy-tmp/**
+            **/error_log
+            **/deploy.ps1
+            **/render.yaml
+            **/.github/**
