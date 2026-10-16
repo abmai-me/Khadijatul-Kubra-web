@@ -65,7 +65,7 @@
   },
   "marriages": [
     {
-      "certificateNo": "KKT-1202989-0001-2026",
+      "certificateNo": "KKT-0001-2026",
       "groomFirstName": "RAHAMAT",
       "groomLastName": "ALI",
       "groomDobDay": "01",
@@ -122,7 +122,7 @@
       "downloadToken": "a5aa76f7-0038-40e1-a14e-18304bda876a",
       "verifyCode": "2ce0c74ecb9b",
       "createdAt": "2026-10-14T18:08:19.888Z",
-      "updatedAt": "2026-10-16T19:22:29.515Z",
+      "updatedAt": "2026-10-16T19:34:43.494Z",
       "approvedAt": "2026-10-16T19:22:29.515Z",
       "downloadPin": "500031",
       "pinSmsMobile": "07849812099",
