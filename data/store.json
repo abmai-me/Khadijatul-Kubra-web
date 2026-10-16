@@ -718,7 +718,7 @@
           "maxW": 181.48250513498556,
           "font": "Source Sans 3-Bold",
           "color": "#143826",
-          "align": "left",
+          "align": "center",
           "kind": "text",
           "boxH": 13.88888888888889
         },
@@ -733,7 +733,7 @@
           "maxW": 182.94680769940348,
           "font": "Source Sans 3-Bold",
           "color": "#143826",
-          "align": "left",
+          "align": "center",
           "kind": "text",
           "boxH": 13.88888888888889
         },
@@ -744,13 +744,13 @@
           "page": 0,
           "x": 103.57561151589694,
           "y": 580.6762367657278,
-          "size": 8,
+          "size": 9,
           "maxW": 24.179802152389144,
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
           "kind": "text",
-          "boxH": 11.11111111111111
+          "boxH": 12.5
         },
         {
           "id": "fmvbace4c",
@@ -793,7 +793,7 @@
           "maxW": 111.92813332513376,
           "font": "Source Sans 3-Bold",
           "color": "#143826",
-          "align": "left",
+          "align": "center",
           "kind": "text",
           "boxH": 13.88888888888889
         },
@@ -808,7 +808,7 @@
           "maxW": 116.32104101838756,
           "font": "Source Sans 3-Bold",
           "color": "#143826",
-          "align": "left",
+          "align": "center",
           "kind": "text",
           "boxH": 13.88888888888889
         },
@@ -819,13 +819,13 @@
           "page": 0,
           "x": 39.20670116229011,
           "y": 510.7212409261422,
-          "size": 8.64,
+          "size": 9,
           "maxW": 240.05460771170286,
           "font": "Source Sans 3-Bold",
           "color": "#143826",
-          "align": "left",
+          "align": "center",
           "kind": "text",
-          "boxH": 12
+          "boxH": 12.5
         },
         {
           "id": "fmvbaqjfp",
@@ -888,7 +888,7 @@
           "boxH": 27.633819059405937
         }
       ],
-      "updatedAt": "2026-10-16T19:21:46.230Z"
+      "updatedAt": "2026-10-16T19:35:37.520Z"
     }
   ],
   "certifierSigns": [
