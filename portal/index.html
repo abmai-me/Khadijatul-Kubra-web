@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>CRM Portal | Khadijatul Kubra Trust</title>
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -10,6 +10,7 @@
   <link rel="shortcut icon" href="../assets/images/favicon.png">
 </head>
 <body>
+  <div class="nav-backdrop" id="navBackdrop"></div>
   <div class="shell">
     <aside class="sidebar">
       <div class="brand">
@@ -34,6 +35,9 @@
 
     <div class="workspace">
       <header class="appbar">
+        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Open menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
         <div class="appbar-brand">
           <span>Khadijatul Kubra Trust</span>
           <strong>Admin Portal</strong>
@@ -938,7 +942,7 @@
     </div>
   </div>
 
-  <script src="/assets/js/signature-clean.js"></script>
+  <script src="../assets/js/signature-clean.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="js/portal.js"></script>
   <script src="js/builder.js"></script>
