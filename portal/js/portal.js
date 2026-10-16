@@ -754,6 +754,13 @@ document.querySelectorAll(".nav-link[data-view]").forEach((btn) => {
   btn.addEventListener("click", () => showView(btn.dataset.view));
 });
 
+document.getElementById("menuToggle")?.addEventListener("click", () => {
+  document.body.classList.toggle("nav-open");
+});
+document.getElementById("navBackdrop")?.addEventListener("click", () => {
+  document.body.classList.remove("nav-open");
+});
+
 document.getElementById("logoutMenuBtn").addEventListener("click", async () => {
   await api("/api/logout", { method: "POST" });
   location.href = "/portal/login.html";
@@ -1777,6 +1784,7 @@ function renderUserRoster() {
         })
         .join("")
     : `<tr><td colspan="5" class="muted">No users yet. Add the first user below.</td></tr>`;
+  tagMobileLabels(body);
 
   body.querySelectorAll("[data-edit-user]").forEach((btn) => {
     btn.addEventListener("click", () => {
