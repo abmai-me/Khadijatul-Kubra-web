@@ -41,8 +41,11 @@ function tagMobileLabels(tbody) {
   });
 }
 
+const CONTENT_VIEWS = new Set(["content", "media", "notice", "vacancy"]);
+
 function showView(name) {
-  const allowed = name === "settings" ? can("users", "manage") : can(name, "view");
+  const moduleKey = CONTENT_VIEWS.has(name) ? "content" : name;
+  const allowed = name === "settings" ? can("users", "manage") : can(moduleKey, "view");
   if (!allowed) return;
   document.body.classList.remove("nav-open");
   document.getElementById("noAccess")?.classList.add("hidden");
@@ -50,6 +53,7 @@ function showView(name) {
   document.querySelectorAll(".nav-link[data-view]").forEach((n) => n.classList.remove("active"));
   document.getElementById(`view-${name}`)?.classList.add("active");
   document.querySelector(`.nav-link[data-view="${name}"]`)?.classList.add("active");
+  document.querySelector(".nav-group")?.classList.toggle("is-open", CONTENT_VIEWS.has(name));
   if (name === "dashboard") loadDashboard();
   if (name === "students") loadStudents();
   if (name === "donations") loadDonations();
@@ -57,6 +61,8 @@ function showView(name) {
   if (name === "prayer") loadPrayer();
   if (name === "marriage") loadMarriages();
   if (name === "content" && typeof loadBuilder === "function") loadBuilder();
+  if (name === "media" && typeof loadMediaKits === "function") loadMediaKits().catch(() => {});
+  if ((name === "notice" || name === "vacancy") && typeof loadBoard === "function") loadBoard(name);
   if (name === "settings") {
     showSettingsPanel("profile");
     renderMyProfile();
@@ -754,6 +760,10 @@ document.querySelectorAll(".nav-link[data-view]").forEach((btn) => {
   btn.addEventListener("click", () => showView(btn.dataset.view));
 });
 
+document.getElementById("websiteToggle")?.addEventListener("click", () => {
+  document.querySelector(".nav-group")?.classList.toggle("is-open");
+});
+
 document.getElementById("menuToggle")?.addEventListener("click", () => {
   document.body.classList.toggle("nav-open");
 });
@@ -1426,7 +1436,7 @@ function applyChrome() {
   document.getElementById("menuUsername").textContent = currentUser?.username ? `@${currentUser.username}` : "";
   document.getElementById("menuRole").textContent = role;
   setAvatarEl(document.getElementById("menuAvatar"), name, photo);
-  document.querySelectorAll(".nav-link[data-module]").forEach((btn) => {
+  document.querySelectorAll("[data-module].nav-link, .nav-group[data-module]").forEach((btn) => {
     const action = btn.dataset.action || "view";
     btn.classList.toggle("hidden", !can(btn.dataset.module, action));
   });

@@ -75,7 +75,7 @@
       "groomPlaceOfBirth": "DHAKA",
       "groomFather": "ABUL KHAIR",
       "groomMother": "RAHIMA KHATUN",
-      "groomAddress": "DSKF SDJFLKIJ",
+      "groomAddress": "Flat5, Bicknell House\nLondon\nE1 1EJ",
       "groomMobile": "07466616520",
       "groomPhone": "",
       "brideFirstName": "LAMIA",
@@ -94,7 +94,7 @@
       "marriageMonth": "10",
       "marriageYear": "2026",
       "placeOfMarriage": "Khadijatul Kubra Trust Mosque, Leicester",
-      "dowryAmount": "5000",
+      "dowryAmount": "5000/-",
       "dowryCash": "3000",
       "dowryJewellery": "1000",
       "dowryLand": "2000",
@@ -115,14 +115,14 @@
       "brideName": "LAMIA KAHTUN",
       "weddingDate": "2026-10-15",
       "venue": "Khadijatul Kubra Trust Mosque, Leicester",
-      "mahr": "5000",
+      "mahr": "5000/-",
       "witnesses": "SHAFIK, RAFIQ",
       "id": "7f00b77f-afd3-4558-9feb-6598bac44490",
       "source": "public",
       "downloadToken": "a5aa76f7-0038-40e1-a14e-18304bda876a",
       "verifyCode": "2ce0c74ecb9b",
       "createdAt": "2026-10-14T18:08:19.888Z",
-      "updatedAt": "2026-10-16T19:34:43.494Z",
+      "updatedAt": "2026-10-17T11:45:19.743Z",
       "approvedAt": "2026-10-16T19:22:29.515Z",
       "downloadPin": "500031",
       "pinSmsMobile": "07849812099",
@@ -688,7 +688,7 @@
   "formTemplates": [
     {
       "id": "21d9b8df-ec98-4268-bdff-60967614d8a5",
-      "name": "Marriage",
+      "name": "Nikah Nama",
       "category": "Marriage",
       "active": true,
       "fields": [
@@ -704,8 +704,10 @@
           "font": "Helvetica",
           "color": "#143826",
           "align": "left",
+          "vAlign": "middle",
           "kind": "qr",
-          "boxH": 64.18542904879773
+          "boxH": 64.18542904879773,
+          "lineGap": 12.649999999999999
         },
         {
           "id": "fmvba9gd0",
@@ -719,8 +721,10 @@
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 13.88888888888889
+          "boxH": 13.88888888888889,
+          "lineGap": 11.5
         },
         {
           "id": "fmvbaa278",
@@ -734,8 +738,10 @@
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 13.88888888888889
+          "boxH": 13.88888888888889,
+          "lineGap": 11.5
         },
         {
           "id": "fmvbaaear",
@@ -749,8 +755,10 @@
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 12.5
+          "boxH": 12.5,
+          "lineGap": 10.35
         },
         {
           "id": "fmvbace4c",
@@ -764,8 +772,10 @@
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 12.5
+          "boxH": 12.5,
+          "lineGap": 10.35
         },
         {
           "id": "fmvbad1d8",
@@ -779,8 +789,10 @@
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 12
+          "boxH": 12,
+          "lineGap": 9.936
         },
         {
           "id": "fmvbag152",
@@ -794,8 +806,10 @@
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 13.88888888888889
+          "boxH": 13.88888888888889,
+          "lineGap": 11.5
         },
         {
           "id": "fmvbagr7o",
@@ -809,8 +823,10 @@
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 13.88888888888889
+          "boxH": 13.88888888888889,
+          "lineGap": 11.5
         },
         {
           "id": "fmvbakd2s",
@@ -824,8 +840,10 @@
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 12.5
+          "boxH": 12.5,
+          "lineGap": 10.35
         },
         {
           "id": "fmvbaqjfp",
@@ -839,23 +857,27 @@
           "font": "Helvetica",
           "color": "#143826",
           "align": "left",
+          "vAlign": "middle",
           "kind": "sign",
-          "boxH": 26.57906361847365
+          "boxH": 26.57906361847365,
+          "lineGap": 12.649999999999999
         },
         {
           "id": "fmvbarxdp",
           "key": "dowryAmount",
           "label": "Dowry amount",
           "page": 0,
-          "x": 248.4665198868459,
-          "y": 307.1914211739744,
-          "size": 20,
-          "maxW": 66.64457652050918,
+          "x": 245.94059796322497,
+          "y": 304.0077070827438,
+          "size": 26,
+          "maxW": 75.06431626591228,
           "font": "Source Sans 3-Bold",
-          "color": "#143826",
+          "color": "#048a45",
           "align": "left",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 27.77777777777778
+          "boxH": 36.111111111111114,
+          "lineGap": 23
         },
         {
           "id": "fmvbb1odh",
@@ -869,8 +891,10 @@
           "font": "Source Sans 3-Bold",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "text",
-          "boxH": 13.88888888888889
+          "boxH": 13.88888888888889,
+          "lineGap": 11.5
         },
         {
           "id": "fmvbboaeu",
@@ -884,11 +908,30 @@
           "font": "Helvetica",
           "color": "#143826",
           "align": "center",
+          "vAlign": "middle",
           "kind": "sign",
-          "boxH": 27.633819059405937
+          "boxH": 27.633819059405937,
+          "lineGap": 12.649999999999999
+        },
+        {
+          "id": "fmvbxe7x6",
+          "key": "groomAddress",
+          "label": "Groom present address",
+          "page": 0,
+          "x": 39.77834338557993,
+          "y": 420.82055387724864,
+          "size": 10,
+          "maxW": 240.81529529780565,
+          "font": "Source Sans 3-Bold",
+          "color": "#143826",
+          "align": "left",
+          "vAlign": "middle",
+          "kind": "text",
+          "boxH": 36.9,
+          "lineGap": 10.5
         }
       ],
-      "updatedAt": "2026-10-16T19:35:37.520Z"
+      "updatedAt": "2026-10-17T11:44:46.645Z"
     }
   ],
   "certifierSigns": [
@@ -899,5 +942,66 @@
       "createdAt": "2026-10-16T19:22:11.001Z"
     }
   ],
-  "formFonts": []
+  "formFonts": [],
+  "mediaKits": [
+    {
+      "id": "249e4641-a06a-4e7f-a503-8192110ce4d8",
+      "title": "LOGO",
+      "style": "LANDSCAPE",
+      "version": "2.0",
+      "publishedAt": "2026-10-17",
+      "pinned": false,
+      "preview": "preview.png",
+      "files": {
+        "ai": "",
+        "eps": "",
+        "pdf": "",
+        "png": "",
+        "jpg": ""
+      },
+      "createdAt": "2026-10-17T07:58:45.724Z",
+      "downloadPin": ""
+    }
+  ],
+  "notices": [
+    {
+      "id": "notice-admission",
+      "title": "Student Admission Form-Khadija (Ra) Academy",
+      "note": "",
+      "publishedAt": "2024-06-29",
+      "time": "8.00pm",
+      "icon": "fa-file-lines",
+      "link": "/doc/Admission_form.pdf",
+      "file": "",
+      "pinned": false,
+      "createdAt": "2024-06-29T12:00:00.000Z"
+    },
+    {
+      "id": "notice-open-day",
+      "title": "We are annouced about our Khadija (Ra) Academy Open Day",
+      "note": "",
+      "publishedAt": "2024-06-25",
+      "time": "10.00am",
+      "icon": "fa-bullhorn",
+      "link": "/doc/Khadija_(Ra)_Academy_Open_Day_Announcement.pdf",
+      "file": "",
+      "pinned": false,
+      "createdAt": "2024-06-25T04:00:00.000Z"
+    }
+  ],
+  "vacancies": [
+    {
+      "id": "8744cf0d-81fd-4259-a6da-5352f70e592f",
+      "title": "Media Officer",
+      "note": "",
+      "publishedAt": "2026-10-06",
+      "time": "10.00pm",
+      "icon": "fa-briefcase",
+      "link": "",
+      "file": "",
+      "pinned": false,
+      "createdAt": "2026-10-17T10:15:03.128Z",
+      "details": "<p><b>Role</b></p><p><span style=\"color: #1d8e5a; font-size: 22px; font-family: Georgia, serif\"><i>Write the full vacancy here.</i></span></p>"
+    }
+  ]
 }

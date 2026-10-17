@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -10,6 +10,8 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="assets/css/board.css" rel="stylesheet">
 
 <link rel="shortcut icon" href="assets/images/favicon.png" type="image/x-icon">
 <link rel="icon" href="assets/images/favicon.png" type="image/x-icon">
@@ -143,7 +145,7 @@
 												</ul>
 											</li>
 											<li><a href="notice.html">Notice Board</a></li>
-											<li><a href="#">Vacancies</a></li>
+											<li><a href="vacancy.html">Vacancies</a></li>
 											</ul>
 										</li>
 										<li class="dropdown"><a href="#">Gallery</a>
@@ -227,36 +229,14 @@
 					</div>
 				</div>
 				
-				<div class="content">
-				    
-				    <!-- Post Widget -->
-						<div class="sidebar-widget style-two post-widget">
-							<div class="widget-content">
-								<!-- Sidebar Title -->
-								<div class="sidebar-title">
-									<h4 >Lastest Notices</h4>
-								</div>
-								<div class="content">
-									<!-- Post -->
-									<div class="post">
-										<div class="thumb"><a href="#"><img src="assets/images/formicon.png" alt=""></a></div>
-										<div class="post-date">Published 29 June 2024 Time: 8.00pm</div>
-										<h6><a href="doc/Admission_form.pdf">Student Admission Form-Khadija (Ra) Academy </a></h6>
-						
-									</div>
-								
-									<!-- Post -->
-									<div class="post">
-										<div class="thumb"><a href="#"><img src="assets/images/announcement.png" alt=""></a></div>
-										<div class="post-date">Published 25 June 2024 Time: 10.00am</div>
-										<h6><a href="doc/Khadija_(Ra)_Academy_Open_Day_Announcement.pdf">We are annouced about our Khadija (Ra) Academy Open Day</a></h6>
-										
-									</div>
-								
-								</div>
-							</div>
+				<div class="content board-page" id="boardMount" data-board="notice">
+					<div class="board-tools">
+						<div class="board-toggle" role="group" aria-label="Notice layout">
+							<button type="button" data-board-toggle="box" class="is-active">Box</button>
+							<button type="button" data-board-toggle="list">List</button>
 						</div>
-					
+					</div>
+					<div data-board-grid class="board-grid"></div>
 				</div>
 				
 				
@@ -445,5 +425,6 @@
 <script src="assets/js/script.js"></script>
 
 <script src="assets/js/site-cms.js"></script>
+<script src="assets/js/board-page.js"></script>
 </body>
 </html>

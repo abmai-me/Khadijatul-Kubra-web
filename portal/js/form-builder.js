@@ -157,16 +157,25 @@ function paintBox(box, field) {
   box.style.fontStyle = style.italic ? "italic" : "normal";
   box.style.color = field.color || "#143826";
   box.style.justifyContent = field.align === "center" ? "center" : field.align === "right" ? "flex-end" : "flex-start";
+  const vAlign = field.vAlign || "middle";
+  box.style.alignItems = vAlign === "top" ? "flex-start" : vAlign === "bottom" ? "flex-end" : "center";
+  box.style.whiteSpace = "pre-line";
+  const gap = Number(field.lineGap) || field.size * 1.15;
+  box.style.lineHeight = String(Math.max(0.9, gap / Math.max(field.size, 1)));
 }
 
 function selectedFormField() {
   return formDraft?.fields?.find((field) => field.id === formSelectedId) || null;
 }
 
-function defaultBox(kind) {
-  if (kind === "qr") return { maxW: 72, boxH: 72, size: 11 };
-  if (kind === "sign") return { maxW: 120, boxH: 42, size: 11 };
-  return { maxW: 150, boxH: 18, size: 11 };
+function defaultBox(kind, key = "") {
+  if (kind === "qr") return { maxW: 72, boxH: 72, size: 11, lineGap: 12 };
+  if (kind === "sign") return { maxW: 120, boxH: 42, size: 11, lineGap: 12 };
+  const size = 11;
+  if (/address|notes/i.test(key)) {
+    return { maxW: 230, boxH: size * 3.4, size, lineGap: Math.round(size * 1.15 * 10) / 10 };
+  }
+  return { maxW: 150, boxH: 18, size, lineGap: Math.round(size * 1.15 * 10) / 10 };
 }
 
 async function loadFormBuilder() {
@@ -261,6 +270,9 @@ function syncSelectionBar() {
   document.getElementById("formStyleItalic").classList.toggle("active", style.italic);
   document.getElementById("formStyleRegular").classList.toggle("active", !style.bold && !style.italic);
   document.getElementById("formSize").value = String(Math.round(field.size));
+  const gap = Number(field.lineGap) || field.size * 1.15;
+  document.getElementById("formLineGap").value = String(Math.round(gap * 10) / 10);
+  document.getElementById("formVAlign").value = field.vAlign || "middle";
   document.getElementById("formColor").value = field.color || "#143826";
 }
 
@@ -356,7 +368,11 @@ function drawFormBoxes() {
       const top = (formPageHeight - Number(field.y) - height) * formScale;
       const style = splitFont(field.font);
       const justify = field.align === "center" ? "center" : field.align === "right" ? "flex-end" : "flex-start";
-      return `<div class="pdf-box${field.id === formSelectedId ? " selected" : ""} kind-${esc(field.kind || "text")}" data-chip="${esc(field.id)}" style="left:${left}px;top:${top}px;width:${Number(field.maxW) * formScale}px;height:${height * formScale}px;justify-content:${justify};font-family:${cssFontFamily(style.family)};font-size:${Math.max(10, Number(field.size) * formScale)}px;font-weight:${style.bold ? 700 : 400};font-style:${style.italic ? "italic" : "normal"};color:${esc(field.color || "#143826")}">
+      const vAlign = field.vAlign || "middle";
+      const alignItems = vAlign === "top" ? "flex-start" : vAlign === "bottom" ? "flex-end" : "center";
+      const gap = Number(field.lineGap) || Number(field.size) * 1.15;
+      const lineHeight = Math.max(0.9, gap / Math.max(Number(field.size) || 11, 1));
+      return `<div class="pdf-box${field.id === formSelectedId ? " selected" : ""} kind-${esc(field.kind || "text")}" data-chip="${esc(field.id)}" style="left:${left}px;top:${top}px;width:${Number(field.maxW) * formScale}px;height:${height * formScale}px;justify-content:${justify};align-items:${alignItems};white-space:pre-line;line-height:${lineHeight};font-family:${cssFontFamily(style.family)};font-size:${Math.max(10, Number(field.size) * formScale)}px;font-weight:${style.bold ? 700 : 400};font-style:${style.italic ? "italic" : "normal"};color:${esc(field.color || "#143826")}">
         <span>${esc(field.label || field.key)}</span>
         <i class="pdf-handle" data-resize="${esc(field.id)}"></i>
       </div>`;
@@ -370,7 +386,7 @@ function placeField(item, point) {
     return;
   }
   formError("");
-  const box = defaultBox(item.kind);
+  const box = defaultBox(item.kind, item.key);
   const id = `f${Date.now().toString(36)}`;
   const x = Math.max(0, point.x / formScale);
   const y = Math.max(0, formPageHeight - point.y / formScale - box.boxH);
@@ -385,9 +401,11 @@ function placeField(item, point) {
     size: box.size,
     maxW: box.maxW,
     boxH: box.boxH,
+    lineGap: box.lineGap,
     font: item.kind === "text" ? joinFont(formFontFamily, false, false) : "Helvetica",
     color: "#143826",
     align: "left",
+    vAlign: /address|notes/i.test(item.key) ? "top" : "middle",
   });
   formSelectedId = id;
   drawFormBoxes();
@@ -575,6 +593,8 @@ document.getElementById("formBuilderOverlay")?.addEventListener("pointerdown", (
       target.boxH = target.size / 0.72;
       target.color = source.color || "#143826";
       target.align = source.align || "left";
+      target.vAlign = source.vAlign || "middle";
+      if (source.lineGap) target.lineGap = source.lineGap;
       formSelectedId = target.id;
       drawFormBoxes();
       syncSelectionBar();
@@ -664,14 +684,20 @@ async function applyToolbar() {
   }
   if (field.kind !== "text") return;
   field.font = currentFontChoice();
-  field.size = Math.min(48, Math.max(6, Number(document.getElementById("formSize").value) || 11));
-  field.boxH = field.size / 0.72;
+  const nextSize = Math.min(48, Math.max(6, Number(document.getElementById("formSize").value) || 11));
+  const nextGap = Math.min(40, Math.max(6, Number(document.getElementById("formLineGap").value) || nextSize * 1.15));
+  field.size = nextSize;
+  field.lineGap = nextGap;
+  // Keep tall address boxes when only the font size changes.
+  const minBox = nextSize / 0.72;
+  if (!field.boxH || field.boxH < minBox * 1.35) field.boxH = minBox;
   field.color = document.getElementById("formColor").value;
   field.align = document.getElementById("formAlign").value;
+  field.vAlign = document.getElementById("formVAlign").value || "middle";
   drawFormBoxes();
   syncSelectionBar();
 }
-["formSize", "formColor", "formAlign"].forEach((id) => {
+["formSize", "formLineGap", "formColor", "formAlign", "formVAlign"].forEach((id) => {
   document.getElementById(id)?.addEventListener("input", applyToolbar);
 });
 document.getElementById("formFontList")?.addEventListener("click", (event) => {

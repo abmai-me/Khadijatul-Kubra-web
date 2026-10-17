@@ -289,11 +289,144 @@ function toast(msg) {
   setTimeout(() => el.classList.add("hidden"), 2500);
 }
 
+let editingMediaKit = null;
+let mediaAdminView = "list";
+
+function mediaText(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function mediaFileInput(kind) {
+  return document.getElementById(
+    { preview: "mkPreview", ai: "mkAi", eps: "mkEps", pdf: "mkPdf", png: "mkPng", jpg: "mkJpg" }[kind]
+  );
+}
+
+function openMediaKitForm() {
+  const form = document.getElementById("mediaKitForm");
+  form.classList.remove("hidden");
+  form.scrollIntoView({ block: "nearest" });
+}
+
+function closeMediaKitForm() {
+  editingMediaKit = null;
+  document.getElementById("mediaKitForm").reset();
+  document.getElementById("mkDate").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("mediaKitFormTitle").textContent = "New media kit";
+  document.getElementById("mkSave").textContent = "Save";
+  document.getElementById("mediaKitForm").classList.add("hidden");
+}
+
+function renderMediaKits(kits) {
+  const list = document.getElementById("mediaKitList");
+  list.classList.toggle("is-box", mediaAdminView === "box");
+  document.querySelectorAll("[data-mk-admin-view]").forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.mkAdminView === mediaAdminView);
+  });
+  if (!kits.length) {
+    list.innerHTML = `<p class="muted">No kits yet. Press Add to open the form.</p>`;
+    return;
+  }
+  list.innerHTML = kits.map((kit) => {
+    const ready = ["ai", "eps", "pdf", "png", "jpg"].filter((kind) => kit.files?.[kind]).map((kind) => kind.toUpperCase());
+    return `<article class="mk-admin-card">
+      <img src="${mediaText(kit.previewUrl || "/assets/images/logo.png")}" alt="">
+      <div class="mk-body">
+        <h4>${mediaText(kit.title)}${kit.pinned ? `<span class="mk-badge">Pinned</span>` : ""}</h4>
+        <p>${mediaText(kit.publishedAt || "")} · ${mediaText(kit.style || "—")} · Version ${mediaText(kit.version || "1.0")}</p>
+        <p>${kit.downloadPin ? "Download PIN on" : "Download PIN off"} · ${ready.length ? ready.join(", ") : "No files yet"}</p>
+        <div class="actions">
+          <button class="btn btn-secondary" type="button" data-mk-edit="${kit.id}">Edit</button>
+          <button class="btn btn-secondary" type="button" data-mk-pin="${kit.id}">${kit.pinned ? "Unpin" : "Pin"}</button>
+          <button class="btn btn-danger" type="button" data-mk-delete="${kit.id}">Delete</button>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+  list.querySelectorAll("[data-mk-edit]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const kit = kits.find((item) => item.id === button.dataset.mkEdit);
+      if (!kit) return;
+      editingMediaKit = kit.id;
+      document.getElementById("mkTitle").value = kit.title || "";
+      document.getElementById("mkStyle").value = kit.style || "";
+      document.getElementById("mkVersion").value = kit.version || "";
+      document.getElementById("mkDate").value = kit.publishedAt || "";
+      document.getElementById("mkPin").checked = Boolean(kit.pinned);
+      document.getElementById("mkDownloadPin").value = kit.downloadPin || "";
+      document.getElementById("mediaKitFormTitle").textContent = `Edit ${kit.title}`;
+      document.getElementById("mkSave").textContent = "Save";
+      openMediaKitForm();
+    });
+  });
+  list.querySelectorAll("[data-mk-pin]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const kit = kits.find((item) => item.id === button.dataset.mkPin);
+      await api(`/api/media-kits/${button.dataset.mkPin}`, {
+        method: "PUT",
+        body: JSON.stringify({ pinned: !kit?.pinned }),
+      });
+      toast(kit?.pinned ? "Pin turned off" : "Kit pinned to the top");
+      loadMediaKits();
+    });
+  });
+  list.querySelectorAll("[data-mk-delete]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!confirm("Delete this media kit?")) return;
+      await api(`/api/media-kits/${button.dataset.mkDelete}`, { method: "DELETE" });
+      if (editingMediaKit === button.dataset.mkDelete) closeMediaKitForm();
+      toast("Media kit deleted");
+      loadMediaKits();
+    });
+  });
+}
+
+async function loadMediaKits() {
+  const kits = await api("/api/media-kits");
+  renderMediaKits(kits);
+}
+
+async function saveMediaKit(event) {
+  event.preventDefault();
+  const payload = {
+    title: document.getElementById("mkTitle").value.trim(),
+    style: document.getElementById("mkStyle").value.trim(),
+    version: document.getElementById("mkVersion").value.trim(),
+    publishedAt: document.getElementById("mkDate").value,
+    pinned: document.getElementById("mkPin").checked,
+    downloadPin: document.getElementById("mkDownloadPin").value.trim(),
+  };
+  const kit = editingMediaKit
+    ? await api(`/api/media-kits/${editingMediaKit}`, { method: "PUT", body: JSON.stringify(payload) })
+    : await api("/api/media-kits", { method: "POST", body: JSON.stringify(payload) });
+  for (const kind of ["preview", "ai", "eps", "pdf", "png", "jpg"]) {
+    const file = mediaFileInput(kind)?.files?.[0];
+    if (!file) continue;
+    await api(`/api/media-kits/${kit.id}/files/${kind}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/octet-stream",
+        "X-File-Name": encodeURIComponent(file.name),
+      },
+      body: await file.arrayBuffer(),
+    });
+  }
+  toast(editingMediaKit ? "Media kit updated" : "Media kit added");
+  mediaAdminView = "list";
+  closeMediaKitForm();
+  loadMediaKits();
+}
+
 function showBuilderTab(name) {
   document.querySelectorAll(".builder-tab").forEach((t) => t.classList.remove("active"));
   document.querySelectorAll(".builder-panel").forEach((p) => p.classList.remove("active"));
   document.querySelector(`.builder-tab[data-tab="${name}"]`)?.classList.add("active");
   document.getElementById(`builder-${name}`)?.classList.add("active");
+  if (name === "media") loadMediaKits().catch((err) => toast(err.message));
 }
 
 // wire after DOM
@@ -307,4 +440,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("savePageBtn")?.addEventListener("click", savePage);
   document.getElementById("addTopMenuBtn")?.addEventListener("click", addTopMenu);
   document.getElementById("addCmsPageBtn")?.addEventListener("click", addCmsPage);
+  document.getElementById("mediaKitForm")?.addEventListener("submit", (event) => {
+    saveMediaKit(event).catch((err) => toast(err.message));
+  });
+  document.getElementById("mkCancel")?.addEventListener("click", closeMediaKitForm);
+  document.getElementById("mkAddBtn")?.addEventListener("click", () => {
+    closeMediaKitForm();
+    openMediaKitForm();
+  });
+  document.querySelectorAll("[data-mk-admin-view]").forEach((button) => {
+    button.addEventListener("click", () => {
+      mediaAdminView = button.dataset.mkAdminView === "box" ? "box" : "list";
+      loadMediaKits().catch((err) => toast(err.message));
+    });
+  });
+  if (document.getElementById("mkDate")) document.getElementById("mkDate").value = new Date().toISOString().slice(0, 10);
 });

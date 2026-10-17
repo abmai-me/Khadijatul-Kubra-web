@@ -24,6 +24,8 @@ const {
   isFontBytes,
   readFormFontBytes,
 } = require("./lib/form-fonts");
+const { zipStore } = require("./lib/zip-store");
+const boards = require("./lib/site-boards");
 const {
   SIGN_ROLES,
   mergeNikahForm,
@@ -50,12 +52,16 @@ const AVATAR_DIR = path.join(DATA_DIR, "avatars");
 const SIGNATURE_DIR = path.join(DATA_DIR, "signatures");
 const FORM_DIR = path.join(DATA_DIR, "form-templates");
 const FONT_DIR = path.join(DATA_DIR, "fonts");
+const MEDIA_DIR = path.join(DATA_DIR, "media-kits");
+const BOARD_DIR = path.join(DATA_DIR, "boards");
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(AVATAR_DIR)) fs.mkdirSync(AVATAR_DIR, { recursive: true });
 if (!fs.existsSync(SIGNATURE_DIR)) fs.mkdirSync(SIGNATURE_DIR, { recursive: true });
 if (!fs.existsSync(FORM_DIR)) fs.mkdirSync(FORM_DIR, { recursive: true });
 if (!fs.existsSync(FONT_DIR)) fs.mkdirSync(FONT_DIR, { recursive: true });
+if (!fs.existsSync(MEDIA_DIR)) fs.mkdirSync(MEDIA_DIR, { recursive: true });
+if (!fs.existsSync(BOARD_DIR)) fs.mkdirSync(BOARD_DIR, { recursive: true });
 
 // Seed JSON data from repo defaults when the data disk/volume is empty.
 for (const [target, seedName] of [
@@ -1780,6 +1786,358 @@ app.delete("/api/marriages/:id", requirePerm("marriage", "delete"), (req, res) =
   const store = readStore();
   store.marriages = store.marriages.filter((m) => m.id !== req.params.id);
   writeStore(store);
+  res.json({ ok: true });
+});
+
+const MEDIA_FILE_KINDS = {
+  preview: ["png", "jpg", "jpeg", "webp"],
+  ai: ["ai"],
+  eps: ["eps"],
+  pdf: ["pdf"],
+  png: ["png"],
+  jpg: ["jpg", "jpeg"],
+};
+
+function cleanMediaText(value, max = 80) {
+  return String(value || "").replace(/\s+/g, " ").trim().slice(0, max);
+}
+
+function mediaKitDir(id) {
+  return path.join(MEDIA_DIR, id);
+}
+
+function readMediaKits(store) {
+  return Array.isArray(store.mediaKits) ? store.mediaKits : [];
+}
+
+function cleanDownloadPin(value) {
+  if (value == null) return "";
+  const pin = String(value).trim();
+  if (!pin) return "";
+  return /^\d{4,8}$/.test(pin) ? pin : null;
+}
+
+function downloadPinMatches(kit, given) {
+  if (!kit.downloadPin) return true;
+  return String(given || "") === String(kit.downloadPin);
+}
+
+function publicMediaKit(kit, options = {}) {
+  const dir = mediaKitDir(kit.id);
+  const files = {};
+  for (const kind of ["ai", "eps", "pdf", "png", "jpg"]) {
+    files[kind] = Boolean(kit.files?.[kind] && fs.existsSync(path.join(dir, kit.files[kind])));
+  }
+  const previewName = kit.preview && fs.existsSync(path.join(dir, kit.preview)) ? kit.preview : "";
+  const view = {
+    id: kit.id,
+    title: kit.title,
+    style: kit.style,
+    version: kit.version,
+    publishedAt: kit.publishedAt,
+    pinned: Boolean(kit.pinned),
+    pinRequired: Boolean(kit.downloadPin),
+    previewUrl: previewName ? `/api/public/media-kits/${kit.id}/file/preview` : "",
+    files,
+    hasZip: Object.values(files).some(Boolean),
+  };
+  if (options.admin) view.downloadPin = kit.downloadPin || "";
+  return view;
+}
+
+function sortMediaKits(kits) {
+  return [...kits].sort((a, b) => {
+    if (Boolean(a.pinned) !== Boolean(b.pinned)) return a.pinned ? -1 : 1;
+    return String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
+  });
+}
+
+app.get("/api/public/media-kits", (req, res) => {
+  const kits = sortMediaKits(readMediaKits(readStore()));
+  res.json(kits.map(publicMediaKit));
+});
+
+app.get("/api/public/media-kits/:id/file/:kind", (req, res) => {
+  const kind = req.params.kind;
+  if (!MEDIA_FILE_KINDS[kind]) return res.status(404).end();
+  const kit = readMediaKits(readStore()).find((item) => item.id === req.params.id);
+  if (!kit) return res.status(404).json({ error: "Media kit not found" });
+  if (kind !== "preview" && !downloadPinMatches(kit, req.query.pin)) {
+    return res.status(403).json({ error: "Wrong PIN" });
+  }
+  const name = kind === "preview" ? kit.preview : kit.files?.[kind];
+  const file = name ? path.join(mediaKitDir(kit.id), name) : "";
+  if (!file || !fs.existsSync(file)) return res.status(404).json({ error: "File not found" });
+  const ext = path.extname(file).toLowerCase();
+  const types = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".webp": "image/webp",
+    ".pdf": "application/pdf",
+    ".ai": "application/postscript",
+    ".eps": "application/postscript",
+  };
+  res.setHeader("Content-Type", types[ext] || "application/octet-stream");
+  res.setHeader(
+    "Content-Disposition",
+    `${kind === "preview" ? "inline" : "attachment"}; filename="${path.basename(file)}"`
+  );
+  res.send(fs.readFileSync(file));
+});
+
+app.get("/api/public/media-kits/:id/zip", (req, res) => {
+  const kit = readMediaKits(readStore()).find((item) => item.id === req.params.id);
+  if (!kit) return res.status(404).json({ error: "Media kit not found" });
+  if (!downloadPinMatches(kit, req.query.pin)) return res.status(403).json({ error: "Wrong PIN" });
+  const dir = mediaKitDir(kit.id);
+  const files = [];
+  for (const kind of ["ai", "eps", "pdf", "png", "jpg"]) {
+    const name = kit.files?.[kind];
+    const file = name ? path.join(dir, name) : "";
+    if (name && fs.existsSync(file)) files.push({ name, data: fs.readFileSync(file) });
+  }
+  if (!files.length) return res.status(404).json({ error: "This kit has no files to zip" });
+  const safeTitle = cleanMediaText(kit.title, 40).replace(/[^A-Za-z0-9-]+/g, "-") || "media-kit";
+  res.setHeader("Content-Type", "application/zip");
+  res.setHeader("Content-Disposition", `attachment; filename="${safeTitle}.zip"`);
+  res.send(zipStore(files));
+});
+
+app.get("/api/media-kits", requirePerm("content", "view"), (req, res) => {
+  res.json(sortMediaKits(readMediaKits(readStore())).map((kit) => publicMediaKit(kit, { admin: true })));
+});
+
+app.post("/api/media-kits", requirePerm("content", "update"), (req, res) => {
+  const title = cleanMediaText(req.body?.title, 60);
+  if (!title) return res.status(400).json({ error: "Kit name is required" });
+  if (cleanDownloadPin(req.body?.downloadPin) == null) {
+    return res.status(400).json({ error: "Download PIN must be 4 to 8 digits, or blank to turn it off" });
+  }
+  const store = readStore();
+  store.mediaKits = readMediaKits(store);
+  const kit = {
+    id: uuidv4(),
+    title,
+    style: cleanMediaText(req.body?.style, 40) || "Portrait",
+    version: cleanMediaText(req.body?.version, 20) || "1.0",
+    publishedAt: /^\d{4}-\d{2}-\d{2}$/.test(req.body?.publishedAt || "")
+      ? req.body.publishedAt
+      : new Date().toISOString().slice(0, 10),
+    pinned: Boolean(req.body?.pinned),
+    downloadPin: cleanDownloadPin(req.body?.downloadPin) || "",
+    preview: "",
+    files: { ai: "", eps: "", pdf: "", png: "", jpg: "" },
+    createdAt: new Date().toISOString(),
+  };
+  fs.mkdirSync(mediaKitDir(kit.id), { recursive: true });
+  store.mediaKits.unshift(kit);
+  writeStore(store);
+  res.json(publicMediaKit(kit));
+});
+
+app.put("/api/media-kits/:id", requirePerm("content", "update"), (req, res) => {
+  const store = readStore();
+  const kit = readMediaKits(store).find((item) => item.id === req.params.id);
+  if (!kit) return res.status(404).json({ error: "Media kit not found" });
+  if (req.body?.title != null) {
+    const title = cleanMediaText(req.body.title, 60);
+    if (!title) return res.status(400).json({ error: "Kit name is required" });
+    kit.title = title;
+  }
+  if (req.body?.style != null) kit.style = cleanMediaText(req.body.style, 40);
+  if (req.body?.version != null) kit.version = cleanMediaText(req.body.version, 20) || kit.version;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(req.body?.publishedAt || "")) kit.publishedAt = req.body.publishedAt;
+  if (req.body?.pinned != null) kit.pinned = Boolean(req.body.pinned);
+  if (req.body?.downloadPin != null) {
+    const pin = cleanDownloadPin(req.body.downloadPin);
+    if (pin == null) return res.status(400).json({ error: "Download PIN must be 4 to 8 digits, or blank to turn it off" });
+    kit.downloadPin = pin;
+  }
+  writeStore(store);
+  res.json(publicMediaKit(kit));
+});
+
+app.put(
+  "/api/media-kits/:id/files/:kind",
+  requirePerm("content", "update"),
+  express.raw({ type: () => true, limit: "25mb" }),
+  (req, res) => {
+    const kind = req.params.kind;
+    const allowed = MEDIA_FILE_KINDS[kind];
+    if (!allowed) return res.status(400).json({ error: "Unknown file type" });
+    if (!Buffer.isBuffer(req.body) || req.body.length < 1) {
+      return res.status(400).json({ error: "Upload a file" });
+    }
+    let rawName = "";
+    try {
+      rawName = decodeURIComponent(String(req.get("x-file-name") || ""));
+    } catch (_) {
+      rawName = "";
+    }
+    const ext = (rawName.split(".").pop() || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!allowed.includes(ext)) return res.status(400).json({ error: `Upload a ${allowed.join(" or ")} file` });
+    const store = readStore();
+    const kit = readMediaKits(store).find((item) => item.id === req.params.id);
+    if (!kit) return res.status(404).json({ error: "Media kit not found" });
+    const filename = `${kind}.${ext === "jpeg" ? "jpg" : ext}`;
+    fs.mkdirSync(mediaKitDir(kit.id), { recursive: true });
+    const previous = kind === "preview" ? kit.preview : kit.files?.[kind];
+    if (previous && previous !== filename) {
+      const oldFile = path.join(mediaKitDir(kit.id), previous);
+      if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+    }
+    fs.writeFileSync(path.join(mediaKitDir(kit.id), filename), req.body);
+    if (kind === "preview") kit.preview = filename;
+    else {
+      kit.files = kit.files || {};
+      kit.files[kind] = filename;
+    }
+    writeStore(store);
+    res.json(publicMediaKit(kit));
+  }
+);
+
+app.delete("/api/media-kits/:id", requirePerm("content", "update"), (req, res) => {
+  const store = readStore();
+  const kit = readMediaKits(store).find((item) => item.id === req.params.id);
+  if (!kit) return res.status(404).json({ error: "Media kit not found" });
+  store.mediaKits = readMediaKits(store).filter((item) => item.id !== kit.id);
+  writeStore(store);
+  fs.rmSync(mediaKitDir(kit.id), { recursive: true, force: true });
+  res.json({ ok: true });
+});
+
+function readBoardStore(kind) {
+  const store = readStore();
+  if (boards.seedBoards(store)) writeStore(store);
+  return { store, items: boards.listFor(store, kind) };
+}
+
+function boardFilePath(kind, item) {
+  return item.file ? path.join(BOARD_DIR, kind, item.file) : "";
+}
+
+app.get("/api/public/boards/:kind", (req, res) => {
+  const kind = boards.BOARD_KINDS.includes(req.params.kind) ? req.params.kind : "";
+  if (!kind) return res.status(404).json({ error: "Unknown board" });
+  const { items } = readBoardStore(kind);
+  const sorted = [...items].sort((a, b) => {
+    if (Boolean(a.pinned) !== Boolean(b.pinned)) return a.pinned ? -1 : 1;
+    return String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
+  });
+  res.json(sorted.map((item) => boards.publicItem(kind, item)));
+});
+
+app.get("/api/public/boards/:kind/:id/file", (req, res) => {
+  const kind = boards.BOARD_KINDS.includes(req.params.kind) ? req.params.kind : "";
+  if (!kind) return res.status(404).end();
+  const { items } = readBoardStore(kind);
+  const item = items.find((row) => row.id === req.params.id);
+  const file = item ? boardFilePath(kind, item) : "";
+  if (!file || !fs.existsSync(file)) return res.status(404).end();
+  res.download(file, item.file);
+});
+
+app.get("/api/boards/:kind", requirePerm("content", "view"), (req, res) => {
+  const kind = boards.BOARD_KINDS.includes(req.params.kind) ? req.params.kind : "";
+  if (!kind) return res.status(404).json({ error: "Unknown board" });
+  const { items } = readBoardStore(kind);
+  const sorted = [...items].sort((a, b) => {
+    if (Boolean(a.pinned) !== Boolean(b.pinned)) return a.pinned ? -1 : 1;
+    return String(b.publishedAt || "").localeCompare(String(a.publishedAt || ""));
+  });
+  res.json(sorted.map((item) => boards.publicItem(kind, item)));
+});
+
+app.post("/api/boards/:kind", requirePerm("content", "update"), (req, res) => {
+  const kind = boards.BOARD_KINDS.includes(req.params.kind) ? req.params.kind : "";
+  if (!kind) return res.status(404).json({ error: "Unknown board" });
+  const title = boards.cleanText(req.body?.title, 120);
+  if (!title) return res.status(400).json({ error: "Title is required" });
+  const { store, items } = readBoardStore(kind);
+  const item = {
+    id: uuidv4(),
+    title,
+    note: boards.cleanText(req.body?.note, 180),
+    publishedAt: /^\d{4}-\d{2}-\d{2}$/.test(String(req.body?.publishedAt || "")) ? req.body.publishedAt : "",
+    time: boards.cleanText(req.body?.time, 20),
+    icon: boards.cleanIcon(req.body?.icon),
+    link: "",
+    file: "",
+    pinned: Boolean(req.body?.pinned),
+    details: boards.cleanDetailsHtml(req.body?.details),
+    createdAt: new Date().toISOString(),
+  };
+  items.push(item);
+  writeStore(store);
+  res.json(boards.publicItem(kind, item));
+});
+
+app.put("/api/boards/:kind/:id", requirePerm("content", "update"), (req, res) => {
+  const kind = boards.BOARD_KINDS.includes(req.params.kind) ? req.params.kind : "";
+  if (!kind) return res.status(404).json({ error: "Unknown board" });
+  const { store, items } = readBoardStore(kind);
+  const item = items.find((row) => row.id === req.params.id);
+  if (!item) return res.status(404).json({ error: "Not found" });
+  if (req.body?.title != null) {
+    const title = boards.cleanText(req.body.title, 120);
+    if (!title) return res.status(400).json({ error: "Title is required" });
+    item.title = title;
+  }
+  if (req.body?.note != null) item.note = boards.cleanText(req.body.note, 180);
+  if (req.body?.publishedAt != null) {
+    item.publishedAt = /^\d{4}-\d{2}-\d{2}$/.test(String(req.body.publishedAt || "")) ? req.body.publishedAt : "";
+  }
+  if (req.body?.time != null) item.time = boards.cleanText(req.body.time, 20);
+  if (req.body?.icon != null) item.icon = boards.cleanIcon(req.body.icon);
+  if (req.body?.pinned != null) item.pinned = Boolean(req.body.pinned);
+  if (req.body?.details != null) item.details = boards.cleanDetailsHtml(req.body.details);
+  writeStore(store);
+  res.json(boards.publicItem(kind, item));
+});
+
+app.put(
+  "/api/boards/:kind/:id/file",
+  requirePerm("content", "update"),
+  express.raw({ type: () => true, limit: "15mb" }),
+  (req, res) => {
+    const kind = boards.BOARD_KINDS.includes(req.params.kind) ? req.params.kind : "";
+    if (!kind) return res.status(404).json({ error: "Unknown board" });
+    if (!Buffer.isBuffer(req.body) || req.body.length < 1) return res.status(400).json({ error: "Upload a file" });
+    let rawName = "";
+    try { rawName = decodeURIComponent(String(req.get("x-file-name") || "")); } catch (_) { rawName = ""; }
+    const ext = (rawName.split(".").pop() || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!boards.FILE_EXTS.includes(ext)) return res.status(400).json({ error: "Upload a PDF, Word, PNG, or JPG file" });
+    const { store, items } = readBoardStore(kind);
+    const item = items.find((row) => row.id === req.params.id);
+    if (!item) return res.status(404).json({ error: "Not found" });
+    const filename = `file.${ext === "jpeg" ? "jpg" : ext}`;
+    const dir = path.join(BOARD_DIR, kind);
+    fs.mkdirSync(dir, { recursive: true });
+    if (item.file && item.file !== filename) {
+      const oldFile = path.join(dir, item.file);
+      if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+    }
+    fs.writeFileSync(path.join(dir, filename), req.body);
+    item.file = filename;
+    item.link = "";
+    writeStore(store);
+    res.json(boards.publicItem(kind, item));
+  }
+);
+
+app.delete("/api/boards/:kind/:id", requirePerm("content", "update"), (req, res) => {
+  const kind = boards.BOARD_KINDS.includes(req.params.kind) ? req.params.kind : "";
+  if (!kind) return res.status(404).json({ error: "Unknown board" });
+  const { store, items } = readBoardStore(kind);
+  const item = items.find((row) => row.id === req.params.id);
+  if (!item) return res.status(404).json({ error: "Not found" });
+  const key = kind === "vacancy" ? "vacancies" : "notices";
+  store[key] = items.filter((row) => row.id !== item.id);
+  writeStore(store);
+  const file = boardFilePath(kind, item);
+  if (file && fs.existsSync(file)) fs.unlinkSync(file);
   res.json({ ok: true });
 });
 

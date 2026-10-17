@@ -15,21 +15,32 @@
     <aside class="sidebar">
       <div class="brand">
         <img src="../assets/images/logo.png" alt="Logo">
-        <div>
+        <div class="brand-copy">
           <strong>KKT Portal</strong>
           <span>Organisation CRM</span>
         </div>
       </div>
-      <button class="nav-link active" data-view="dashboard" data-module="dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</button>
-      <button class="nav-link" data-view="students" data-module="students"><i class="fa-solid fa-user-graduate"></i> Students</button>
-      <button class="nav-link" data-view="donations" data-module="donations"><i class="fa-solid fa-hand-holding-heart"></i> Donations</button>
-      <button class="nav-link" data-view="collections" data-module="collections"><i class="fa-solid fa-calculator"></i> Collection Hisab</button>
-      <button class="nav-link" data-view="prayer" data-module="prayer"><i class="fa-solid fa-mosque"></i> Prayer Times</button>
-      <button class="nav-link" data-view="marriage" data-module="marriage"><i class="fa-solid fa-ring"></i> Marriage</button>
-      <button class="nav-link" data-view="content" data-module="content"><i class="fa-solid fa-wand-magic-sparkles"></i> Website Builder</button>
+      <button class="nav-link active" data-view="dashboard" data-module="dashboard"><i class="fa-solid fa-gauge"></i><span class="nav-label">Dashboard</span></button>
+      <button class="nav-link" data-view="students" data-module="students"><i class="fa-solid fa-user-graduate"></i><span class="nav-label">Students</span></button>
+      <button class="nav-link" data-view="donations" data-module="donations"><i class="fa-solid fa-hand-holding-heart"></i><span class="nav-label">Donations</span></button>
+      <button class="nav-link" data-view="collections" data-module="collections"><i class="fa-solid fa-calculator"></i><span class="nav-label">Collection Hisab</span></button>
+      <button class="nav-link" data-view="prayer" data-module="prayer"><i class="fa-solid fa-mosque"></i><span class="nav-label">Prayer Times</span></button>
+      <button class="nav-link" data-view="marriage" data-module="marriage"><i class="fa-solid fa-ring"></i><span class="nav-label">Marriage</span></button>
+      <div class="nav-group" data-module="content">
+        <button type="button" class="nav-link" id="websiteToggle">
+          <i class="fa-solid fa-globe"></i><span class="nav-label">Website</span>
+          <i class="fa-solid fa-chevron-down nav-caret"></i>
+        </button>
+        <div class="nav-sub">
+          <button class="nav-link" data-view="content" data-module="content"><i class="fa-solid fa-wand-magic-sparkles"></i><span class="nav-label">Website Builder</span></button>
+          <button class="nav-link" data-view="media" data-module="content"><i class="fa-solid fa-images"></i><span class="nav-label">Media Kit</span></button>
+          <button class="nav-link" data-view="notice" data-module="content"><i class="fa-solid fa-bullhorn"></i><span class="nav-label">Notice</span></button>
+          <button class="nav-link" data-view="vacancy" data-module="content"><i class="fa-solid fa-briefcase"></i><span class="nav-label">Vacancy</span></button>
+        </div>
+      </div>
       <div class="sidebar-foot">
-        <button class="nav-link" id="settingsBtn" data-view="settings" data-module="users" data-action="manage"><i class="fa-solid fa-gear"></i> Settings</button>
-        <a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Website</a>
+        <button class="nav-link" id="settingsBtn" data-view="settings" data-module="users" data-action="manage"><i class="fa-solid fa-gear"></i><span class="nav-label">Settings</span></button>
+        <a href="/" target="_blank"><i class="fa-solid fa-arrow-up-right-from-square"></i><span class="nav-label">View Website</span></a>
       </div>
     </aside>
 
@@ -80,10 +91,10 @@
           </div>
         </div>
         <div class="grid stats">
-          <div class="card stat-card"><h3 id="statStudents">0</h3><span>Students</span></div>
-          <div class="card stat-card"><h3 id="statDonations">£0</h3><span>Donation Total</span></div>
-          <div class="card stat-card"><h3 id="statCollections">£0</h3><span>Collection Hisab</span></div>
-          <div class="card stat-card"><h3 id="statMarriages">0</h3><span>Marriage Applications</span></div>
+          <div class="card stat-card"><i class="fa-solid fa-user-graduate"></i><div><span>Students</span><h3 id="statStudents">0</h3></div></div>
+          <div class="card stat-card"><i class="fa-solid fa-hand-holding-heart"></i><div><span>Donation Total</span><h3 id="statDonations">£0</h3></div></div>
+          <div class="card stat-card"><i class="fa-solid fa-calculator"></i><div><span>Collection Hisab</span><h3 id="statCollections">£0</h3></div></div>
+          <div class="card stat-card"><i class="fa-solid fa-ring"></i><div><span>Marriage Applications</span><h3 id="statMarriages">0</h3></div></div>
         </div>
         <div class="card" style="margin-top:16px">
           <h3>Today's Prayer Times</h3>
@@ -615,7 +626,62 @@
             <div class="form-group full"><label>Bottom Links JSON</label><textarea id="ftBottomJson" rows="4"></textarea></div>
           </div>
         </div>
+
       </section>
+
+      <section class="view" id="view-media">
+        <div class="topbar">
+          <div>
+            <h2>Media Kit</h2>
+            <p>Logo files, versions, and download PIN</p>
+          </div>
+        </div>
+        <div class="card" id="builder-media">
+          <div class="panel-head">
+            <div>
+              <h3>Media kits</h3>
+              <p class="muted">Add a kit, then it appears below. Pin works in both list and box view.</p>
+            </div>
+            <div class="actions">
+              <div class="mk-view-toggle" role="group" aria-label="Portal media layout">
+                <button type="button" class="mk-view-btn is-active" data-mk-admin-view="list">List</button>
+                <button type="button" class="mk-view-btn" data-mk-admin-view="box">Box</button>
+              </div>
+              <button class="btn btn-primary" id="mkAddBtn" type="button">Add</button>
+              <a class="btn btn-gold" href="/media-kit.html" target="_blank"><i class="fa-solid fa-eye"></i> View page</a>
+            </div>
+          </div>
+          <form id="mediaKitForm" class="form-grid hidden">
+            <div class="form-group full"><h3 id="mediaKitFormTitle">New media kit</h3></div>
+            <div class="form-group"><label>Name</label><input id="mkTitle" maxlength="60" placeholder="LOGO" required></div>
+            <div class="form-group"><label>Style</label><input id="mkStyle" maxlength="40" placeholder="Portrait, Landscape, One Color"></div>
+            <div class="form-group"><label>Version</label><input id="mkVersion" maxlength="20" placeholder="1.0"></div>
+            <div class="form-group"><label>Published date</label><input id="mkDate" type="date"></div>
+            <div class="form-group">
+              <label>Pin</label>
+              <label class="mk-pin-toggle"><input id="mkPin" type="checkbox"> Pin this kit to the top</label>
+            </div>
+            <div class="form-group">
+              <label>Download PIN</label>
+              <input id="mkDownloadPin" inputmode="numeric" maxlength="8" placeholder="Blank = download without PIN">
+            </div>
+            <div class="form-group"><label>Preview image</label><input id="mkPreview" type="file" accept="image/png,image/jpeg,image/webp"></div>
+            <div class="form-group"><label>AI</label><input id="mkAi" type="file" accept=".ai"></div>
+            <div class="form-group"><label>EPS</label><input id="mkEps" type="file" accept=".eps"></div>
+            <div class="form-group"><label>PDF</label><input id="mkPdf" type="file" accept="application/pdf,.pdf"></div>
+            <div class="form-group"><label>PNG</label><input id="mkPng" type="file" accept="image/png,.png"></div>
+            <div class="form-group"><label>JPG</label><input id="mkJpg" type="file" accept="image/jpeg,.jpg,.jpeg"></div>
+            <div class="form-group full actions">
+              <button class="btn btn-primary" type="submit" id="mkSave">Save</button>
+              <button class="btn btn-secondary" type="button" id="mkCancel">Close</button>
+            </div>
+          </form>
+          <div id="mediaKitList" class="mk-admin-list"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-notice"></section>
+      <section class="view" id="view-vacancy"></section>
 
       <section class="view" id="view-settings">
         <div class="topbar">
@@ -862,12 +928,21 @@
                     <button type="button" class="style-btn text-tool" id="formStyleRegular" title="Regular">R</button>
                     <button type="button" class="style-btn text-tool" id="formStyleBold" title="Bold"><b>B</b></button>
                     <button type="button" class="style-btn text-tool" id="formStyleItalic" title="Italic"><i>I</i></button>
-                    <input id="formSize" class="theme-field text-tool size-field" type="number" min="6" max="48" aria-label="Font size">
+                    <input id="formSize" class="theme-field text-tool size-field" type="number" min="6" max="48" aria-label="Font size" title="Font size">
+                    <label class="text-tool linegap-tool" title="Line gap for Enter / wrapped lines">
+                      <span>Gap</span>
+                      <input id="formLineGap" class="theme-field size-field" type="number" min="6" max="40" step="0.5" value="12">
+                    </label>
                     <input id="formColor" class="text-tool color-field" type="color" aria-label="Colour" value="#143826">
-                    <select id="formAlign" class="theme-field align-tool" aria-label="Align">
+                    <select id="formAlign" class="theme-field align-tool" aria-label="Horizontal align" title="Left / Center / Right">
                       <option value="left">Left</option>
                       <option value="center">Center</option>
                       <option value="right">Right</option>
+                    </select>
+                    <select id="formVAlign" class="theme-field text-tool" aria-label="Vertical align" title="Top / Middle / Bottom">
+                      <option value="top">Top</option>
+                      <option value="middle" selected>Middle</option>
+                      <option value="bottom">Bottom</option>
                     </select>
                     <button type="button" class="btn btn-danger btn-sm" id="formDeleteField">Remove</button>
                   </div>
@@ -946,6 +1021,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="js/portal.js"></script>
   <script src="js/builder.js"></script>
+  <script src="js/boards.js"></script>
   <script src="js/form-builder.js"></script>
 </body>
 </html>

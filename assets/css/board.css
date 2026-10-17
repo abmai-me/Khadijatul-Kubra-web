@@ -1,0 +1,144 @@
+.board-page { padding: 8px 0 28px; }
+.board-intro { max-width: 720px; margin: 0 auto 22px; text-align: center; }
+.board-intro .kicker {
+  margin: 0 0 6px;
+  color: #1d8e5a;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.board-intro h2 { margin: 0 0 8px; color: #143826; font-size: 32px; }
+.board-intro p { margin: 0; color: #4f4e4c; }
+.board-tools { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+.board-toggle {
+  display: inline-flex;
+  border: 1px solid #d7e6de;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #fff;
+}
+.board-toggle button {
+  border: 0;
+  background: transparent;
+  color: #254636;
+  padding: 8px 16px;
+  font: inherit;
+  cursor: pointer;
+}
+.board-toggle button.is-active { background: #1d8e5a; color: #fff; }
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+  margin-bottom: 130px;
+}
+.board-page[data-board="vacancy"] .board-grid { margin-bottom: 18px; }
+.board-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e3ebe6;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 24px rgba(16, 32, 25, 0.05);
+  border-top: 3px solid #1d8e5a;
+}
+.board-card::before {
+  content: "";
+  display: block;
+  height: 3px;
+  margin: -18px -18px 8px;
+  background: #f3b815;
+}
+.board-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: #e5f3ed;
+  color: #1d8e5a;
+  font-size: 22px;
+}
+.board-date { margin: 0 0 4px; color: #8a7340; font-size: 13px; font-weight: 600; }
+.board-copy h3 { margin: 0 0 6px; color: #143826; font-size: 18px; line-height: 1.35; }
+.board-copy p { margin: 0; color: #4f4e4c; }
+.board-file {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: #1d8e5a;
+  color: #fff !important;
+  text-decoration: none;
+  font-weight: 600;
+}
+.board-file.is-off { background: #eef3f0; color: #8aa094 !important; }
+.board-side { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.board-details {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: #f3b815;
+  color: #143826 !important;
+  font-weight: 700;
+  border-radius: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  text-decoration: none;
+}
+.board-slide {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease, margin-top 0.35s ease;
+}
+.board-slide.is-open { grid-template-rows: 1fr; margin-top: 12px; }
+.board-grid:not(.is-list) > .board-slide { grid-column: 1 / -1; margin-top: 0; }
+.board-slide-inner { overflow: hidden; }
+.board-slide .board-detail { margin: 0; }
+.board-back {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 14px;
+  color: #1d8e5a;
+  font-weight: 700;
+  text-decoration: none;
+}
+.board-detail {
+  background: #fff;
+  border: 1px solid #e3ebe6;
+  border-top: 3px solid #1d8e5a;
+  border-radius: 16px;
+  padding: 22px 24px 28px;
+  margin: 8px 0 130px;
+  scroll-margin-top: 96px;
+}
+.board-detail h2 { margin: 0 0 14px; color: #143826; font-size: 28px; }
+.board-detail-body { color: #254636; font-size: 16px; line-height: 1.7; }
+.board-detail-body p { margin: 0 0 10px; }
+.board-detail-body h2 { font-size: 28px; }
+.board-detail-body h3 { font-size: 22px; }
+.board-detail-body ul, .board-detail-body ol { margin: 0 0 12px 1.2em; }
+.board-empty { color: #4f4e4c; }
+.board-grid.is-list { grid-template-columns: 1fr; }
+.board-grid.is-list .board-card {
+  flex-direction: row;
+  align-items: center;
+}
+.board-grid.is-list .board-card::before {
+  width: 3px;
+  height: auto;
+  align-self: stretch;
+  margin: -18px 8px -18px -18px;
+}
+.board-grid.is-list .board-copy { flex: 1; }
+.board-grid.is-list .board-side { margin-left: auto; justify-content: flex-end; }
+@media (max-width: 700px) {
+  .board-grid.is-list .board-card { flex-direction: column; align-items: flex-start; }
+  .board-grid.is-list .board-card::before { width: auto; height: 3px; margin: -18px -18px 8px; }
+}
